@@ -5,6 +5,8 @@ from haikunator import Haikunator
 from azure.common.credentials import ServicePrincipalCredentials
 from azure.mgmt.resource import ResourceManagementClient
 from azure.mgmt.resource.resources.models import DeploymentMode
+#PES
+from azure.common.client_factory import get_client_from_cli_profile
 
 class Deployer(object):
     """ Initialize the deployer class with subscription, resource group and public key.
@@ -25,19 +27,31 @@ class Deployer(object):
         with open(pub_ssh_key_path, 'r') as pub_ssh_file_fd:
             self.pub_ssh_key = pub_ssh_file_fd.read()
 
-        self.credentials = ServicePrincipalCredentials(
-            client_id=os.environ['AZURE_CLIENT_ID'],
-            secret=os.environ['AZURE_CLIENT_SECRET'],
-            tenant=os.environ['AZURE_TENANT_ID']
-        )
-        self.client = ResourceManagementClient(self.credentials, self.subscription_id)
+        def get_resource_client():
+            from azure.mgmt.resource import ResourceManagementClient
+            return get_client_from_cli_profile(ResourceManagementClient)
+
+        try:
+            self.credentials = ServicePrincipalCredentials(
+                client_id=os.environ['AZURE_CLIENT_ID'],
+                secret=os.environ['AZURE_CLIENT_SECRET'],
+                tenant=os.environ['AZURE_TENANT_ID']
+            )
+            self.client = ResourceManagementClient(self.credentials, self.subscription_id)
+        except KeyError:
+            self.client = get_resource_client()
+        except Exception as inst:
+            print("type:",type(inst))    # the exception instance
+            print("args:",inst.args)     # arguments stored in .args
+            print("inst:",inst)
+            raise
 
     def deploy(self):
         """Deploy the template to a resource group."""
         self.client.resource_groups.create_or_update(
             self.resource_group,
             {
-                'location':'westus'
+                'location':'australiaeast'
             }
         )
 
