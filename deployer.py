@@ -17,9 +17,10 @@ class Deployer(object):
     """
     name_generator = Haikunator()
 
-    def __init__(self, subscription_id, resource_group, pub_ssh_key_path='~/.ssh/id_rsa.pub'):
+    def __init__(self, subscription_id, resource_group, location, pub_ssh_key_path='~/.ssh/id_rsa.pub'):
         self.subscription_id = subscription_id
         self.resource_group = resource_group
+        self.location = location
         self.dns_label_prefix = self.name_generator.haikunate()
 
         pub_ssh_key_path = os.path.expanduser(pub_ssh_key_path)
@@ -51,7 +52,7 @@ class Deployer(object):
         self.client.resource_groups.create_or_update(
             self.resource_group,
             {
-                'location':'australiaeast'
+                'location': self.location
             }
         )
 
@@ -62,7 +63,8 @@ class Deployer(object):
         parameters = {
             'sshKeyData': self.pub_ssh_key,
             'vmName': 'azure-deployment-sample-vm',
-            'dnsLabelPrefix': self.dns_label_prefix
+            'dnsLabelPrefix': self.dns_label_prefix,
+            'adminUserName': 'pieter'
         }
         parameters = {k: {'value': v} for k, v in parameters.items()}
 

@@ -21,44 +21,50 @@ def run(args):
     msg = "\nInitializing the Deployer class with subscription id: {}, resource group: {}" \
           "\nand public key located at: {}...\n\n"
     msg = msg.format(args.my_subscription_id, args.my_resource_group, args.my_pub_ssh_key_path)
-    print(msg)
+    logging.info(msg)
 
     # Initialize the deployer class
-    deployer = Deployer(args.my_subscription_id, args.my_resource_group, args.my_pub_ssh_key_path)
+    deployer = Deployer(subscription_id=args.my_subscription_id,
+                        resource_group=args.my_resource_group,
+                        pub_ssh_key_path=args.my_pub_ssh_key_path,
+                        location="australiaeast")
 
-    print("Beginning the deployment... \n\n")
+    logging.info("Beginning the deployment... \n\n")
     # Deploy the template
 
-    exit(1)
     my_deployment = deployer.deploy()
 
-    print("Done deploying!!\n\nYou can connect via: `ssh azureSample@{}.westus.cloudapp.azure.com`".format(deployer.dns_label_prefix))
-
+    logging.warn("Done deploying!!\n\nYou can connect via: `ssh azureSample@{}.australiaeast.cloudapp.azure.com`".format(deployer.dns_label_prefix))
+    logging.debug(str(deployer))
     # Destroy the resource group which contains the deployment
     # deployer.destroy()
 
 def main(argv):
-    logging.info('Number of arguments:{} arguments.'.format(len(sys.argv)))
-    logging.info('Argument List: {}'.format(str(sys.argv)))
-
     json_template = ''
     parser = argparse.ArgumentParser()
-    parser.add_argument("-v", "--verbose", action="count", default=0,
-                        help="increase output verbosity")
-    parser.add_argument(dest="template", nargs='?', type=str, default="templates/template.json",
-                        help="template to deploy on azure.")
+    parser.add_argument("-v", "--verbose", action="count",
+                        default=0,
+                        help="increase output verbosity"
+                        )
+    parser.add_argument(dest="template", nargs='?', type=str,
+                        default="templates/template.json",
+                        help="template to deploy on azure."
+                        )
     parser.add_argument("--subscription_id",dest="my_subscription_id",nargs='?', type=str,
                         default=os.environ.get('AZURE_SUBSCRIPTION_ID', ''),
-                        help="azure subscription_id , default picked from environment AZURE_SUBSCRIPTION_ID")
+                        help="azure subscription_id , default picked from environment AZURE_SUBSCRIPTION_ID"
+                        )
     parser.add_argument("--resource_group", dest="my_resource_group" ,nargs='?',
-                        default='pieter-rg',
-                        help="the azure resource group(RG) to deploy the vm in.")
-    parser.add_argument("--my_pub_ssh_key_path", default=os.path.expanduser('~/.ssh/id_rsa.pub'),
-                        help="initial ssh key rsa public key file for vm login.")
+                        default='pieter-rrg',
+                        help="the azure resource group(RG) to deploy the vm in."
+                        )
+    parser.add_argument("--my_pub_ssh_key_path",
+                        default=os.path.expanduser('~/.ssh/id_rsa.pub'),
+                        help="initial ssh key rsa public key file for vm login."
+                        )
 
     args = parser.parse_args()
 
-    print(type(args.verbose))
     if args.verbose > 0:
         log=logging.getLogger()
         log.setLevel(logging.INFO)
@@ -67,11 +73,7 @@ def main(argv):
         log.setLevel(logging.DEBUG)
         logging.debug(f"set logging.level to DEBUG verbose={args.verbose}")
 
-    logging.info(f"json template file is {args.template}")
-    logging.info(f"Azure args is {args}")
-
-    exit(0)
-
+    logging.debug(f"{argv[0]} args is {args}")
 
     run(args)
 

@@ -23,7 +23,7 @@
     },
     "vmSize": {
       "type": "string",
-      "defaultValue": "Standard_D1",
+      "defaultValue": "Standard_D2s_v3",
       "metadata": {
         "description": "Size of the VM"
       }
@@ -50,7 +50,7 @@
     },
     "imageSku": {
       "type": "string",
-      "defaultValue": "16.04.0-LTS",
+      "defaultValue": "16.04-LTS",
       "metadata": {
         "description": "Name of the image sku"
       }
@@ -75,7 +75,11 @@
       "metadata": {
         "description": "Name of the virtual network"
       }
-    }
+    },
+    "availabilitySet_name": {
+            "defaultValue": "pieter-AvailabilitySet",
+            "type": "String"
+        }
   },
   "variables": {
     "storageAccountName": "[concat(uniquestring(resourceGroup().id), 'azsample')]",
@@ -193,16 +197,41 @@
         ]
       }
     },
+
+        {
+            "comments": "PES: copy from template: resource: '/subscriptions/7023221c-6084-483c-bb62-f8db6950fc34/resourceGroups/pieter-rg/providers/Microsoft.Compute/availabilitySets/pieter-AvailabilitySetXXX'.",
+            "type": "Microsoft.Compute/availabilitySets",
+            "sku": {
+                "name": "Aligned"
+            },
+            "name": "[parameters('availabilitySet_name')]",
+            "apiVersion": "2017-12-01",
+            "location": "[variables('location')]",
+            "tags": {},
+            "scale": null,
+            "properties": {
+                "platformUpdateDomainCount": 3,
+                "platformFaultDomainCount": 2,
+                "virtualMachines": []
+            },
+            "dependsOn": []
+        },
+
+
     {
-      "apiVersion": "[variables('apiVersion')]",
+      "apiVersion": "2017-12-01",
       "type": "Microsoft.Compute/virtualMachines",
       "name": "[parameters('vmName')]",
       "location": "[variables('location')]",
       "dependsOn": [
+        "[resourceId('Microsoft.Compute/availabilitySets', parameters('availabilitySet_name'))]",
         "[concat('Microsoft.Storage/storageAccounts/', variables('storageAccountName'))]",
         "[concat('Microsoft.Network/networkInterfaces/', variables('nicName'))]"
       ],
       "properties": {
+        "availabilitySet": {
+                    "id": "[resourceId('Microsoft.Compute/availabilitySets', parameters('availabilitySet_name'))]"
+                },
         "hardwareProfile": {
           "vmSize": "[parameters('vmSize')]"
         },
@@ -229,13 +258,16 @@
             "version": "latest"
           },
           "osDisk": {
+            "osType": "Linux",
             "name": "osdisk",
-            "vhd": {
-              "uri": "[concat('http://',variables('storageAccountName'),'.blob.core.windows.net/',variables('vmStorageAccountContainerName'),'/', variables('osDiskName'),'.vhd')]"
-            },
             "caching": "ReadWrite",
-            "createOption": "FromImage"
-          }
+            "createOption": "FromImage",
+            "managedDisk": {
+              "storageAccountType": "Premium_LRS"
+            },
+            "diskSizeGB": 30
+          },
+          "dataDisks": []
         },
         "networkProfile": {
           "networkInterfaces": [
