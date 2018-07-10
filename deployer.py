@@ -62,7 +62,7 @@ class Deployer(object):
 
         parameters = {
             'sshKeyData': self.pub_ssh_key,
-            'vmName': 'azure-deployment-sample-vm',
+            'vmName': 'NSPTEST01',
             'dnsLabelPrefix': self.dns_label_prefix,
             'adminUserName': 'pieter'
         }
