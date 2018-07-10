@@ -47,7 +47,7 @@ class Deployer(object):
             print("inst:",inst)
             raise
 
-    def deploy(self):
+    def deploy(self,args={}):
         """Deploy the template to a resource group."""
         self.client.resource_groups.create_or_update(
             self.resource_group,
@@ -66,6 +66,7 @@ class Deployer(object):
             'dnsLabelPrefix': self.dns_label_prefix,
             'adminUserName': 'pieter'
         }
+        parameters.update(args) #add args.
         parameters = {k: {'value': v} for k, v in parameters.items()}
 
         deployment_properties = {

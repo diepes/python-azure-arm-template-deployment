@@ -283,6 +283,26 @@
           }
         }
       }
+    },
+
+    {
+      "type": "Microsoft.Compute/virtualMachines/extensions",
+      "name": "[concat(parameters('vmName'), '/installsaltstack')]",
+      "apiVersion": "2015-06-15",
+      "location": "[variables('location')]",
+      "dependsOn": [
+        "[concat('Microsoft.Compute/virtualMachines/', parameters('vmName'))]"
+      ],
+      "properties": {
+        "publisher": "Microsoft.Azure.Extensions",
+        "type": "CustomScript",
+        "typeHandlerVersion": "2.0",
+        "settings": {
+          "commandToExecute": "python -c 'import urllib; print urllib.urlopen(\"https://bootstrap.saltstack.com\").read()' > bootstrap-salt.sh ; sudo sh bootstrap-salt.sh git v2018.3.2"
+        }
+      }
     }
+
   ]
 }
+

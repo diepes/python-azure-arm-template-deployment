@@ -8,7 +8,7 @@ logging.warning("Start!")
 
 
 def run(args):
-    ''' main script after arguments '''
+    ''' main script  after arguments '''
     from deployer import Deployer
 
     # This script expects that the following environment vars are set:
@@ -34,7 +34,7 @@ def run(args):
 
     my_deployment = deployer.deploy()
 
-    logging.warn("Done deploying!!\n\nYou can connect via: `ssh azureSample@{}.australiaeast.cloudapp.azure.com`".format(deployer.dns_label_prefix))
+    logging.warn("Done deploying!!\n\nYou can connect via: `ssh {}@{}.australiaeast.cloudapp.azure.com`".format(args.adminUserName,deployer.dns_label_prefix))
     logging.debug(str(deployer))
     # Destroy the resource group which contains the deployment
     # deployer.destroy()
@@ -55,9 +55,14 @@ def main(argv):
                         help="azure subscription_id , default picked from environment AZURE_SUBSCRIPTION_ID"
                         )
     parser.add_argument("--resource_group", dest="my_resource_group" ,nargs='?',
-                        default='pieter-rrg',
+                        default='pieter-rg',
                         help="the azure resource group(RG) to deploy the vm in."
                         )
+    parser.add_argument("--adminUserName", dest="adminUserName" ,nargs='?',
+                        default='pieter',
+                        help="the initial ssh user."
+                        )
+
     parser.add_argument("--my_pub_ssh_key_path",
                         default=os.path.expanduser('~/.ssh/id_rsa.pub'),
                         help="initial ssh key rsa public key file for vm login."
@@ -75,8 +80,8 @@ def main(argv):
 
     logging.debug(f"{argv[0]} args is {args}")
 
-    run(args)
-
+    run(args) #args also parsed to azure template.json
+    
 if __name__ == "__main__":
     main(sys.argv)
 
