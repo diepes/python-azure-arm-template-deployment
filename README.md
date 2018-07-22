@@ -1,13 +1,13 @@
 ---
 services: azure-resource-manager
 platforms: python
-author: lmazuel
+author: pieter.e.smit 
 ---
 
 # Deploy an SSH Enabled VM with a Template in Python
 
-This sample explains how to use Azure Resource Manager templates to deploy your Resources to Azure. It shows how to
-deploy your Resources by using the Azure SDK for Python.
+This sample explains how to use Azure Resource Manager templates to deploy your Resources to Azure. 
+It shows how to deploy your Resources by using the Azure SDK for Python.
 
 When deploying an application definition with a template, you can provide parameter values to customize how the
 resources are created. You specify values for these parameters either inline or in a parameter file.
@@ -31,11 +31,10 @@ You specify the type of deployment through the Mode property, as shown in the ex
 
 ## Deploy with Python
 
-In this sample, we are going to deploy a resource template which contains an Ubuntu 16.04 LTS virtual machine using
+In this sample, we are going to deploy a resource template which contains an Ubuntu LTS virtual machine using
 ssh public key authentication, storage account, and virtual network with public IP address. The virtual network
 contains a single subnet with a single network security group rule which allows traffic on port 22 for ssh with a single
-network interface belonging to the subnet. The virtual machine is a `Standard_D1` size. You can find the template
-[here](https://github.com/azure-samples/resource-manager-python-template-deployment/blob/master/templates/template.json).
+network interface belonging to the subnet. The virtual machine is a `Standard_D1` size. You can find the template [here](/templates)
 
 ### To run this sample, do the following:
 
@@ -47,15 +46,13 @@ network interface belonging to the subnet. The virtual machine is a `Standard_D1
 
     ```
     pip install virtualenv
-    virtualenv mytestenv
-    cd mytestenv
+    virtualenv venv
+    cd venv
     source bin/activate
     ```
 
-1. Create a Service Principal, either through
+1. Create a Service Principal
     [Azure CLI](https://azure.microsoft.com/documentation/articles/resource-group-authenticate-service-principal-cli/),
-    [PowerShell](https://azure.microsoft.com/documentation/articles/resource-group-authenticate-service-principal/)
-    or [the portal](https://azure.microsoft.com/documentation/articles/resource-group-create-service-principal-portal/).
    
 1. Clone this repository and navigate into it.
 
@@ -70,9 +67,12 @@ network interface belonging to the subnet. The virtual machine is a `Standard_D1
    ```
 
 1. Create environment variables with the necessary IDs for Azure authentication.
-    You can learn where to find the first three IDs in the Azure portal in [this document](https://docs.microsoft.com/en-us/azure/azure-resource-manager/resource-group-create-service-principal-portal#get-application-id-and-authentication-key).
-    The subscription ID is in the subscription's overview in the "Subscriptions" blade of the portal.
+    If you login using the Azure az cli, the credentials will be saved locally and used by the script.
 
+    You can learn where to find the first three IDs in the Azure portal in [this document](https://docs.microsoft.com/en-us/azure/azure-resource-manager/resource-group-create-service-principal-portal#get-application-id-and-authentication-key).
+ 
+    Manual settings if not using az credentials.
+    The subscription ID is in the subscription's overview in the "Subscriptions" blade of the portal.
     ```
     export AZURE_TENANT_ID={your tenant id}
     export AZURE_CLIENT_ID={your client id}
@@ -92,119 +92,13 @@ The entry point for this sample is [azure_deployment.py](https://github.com/azur
 below to deploy the aforementioned template to the subscription and resource group specified in `my_resource_group`
 and `my_subscription_id` respectively. By default the script will use the ssh public key from your default ssh
 location.
-
-*Note: you must set each of the environment variables (`AZURE_TENANT_ID`, `AZURE_CLIENT_ID` and `AZURE_CLIENT_SECRET`) prior to
-running the script, and either set `AZURE_SUBSCRIPTION_ID` or replace it in the script. See the numbered list above for instructions on how to do this.*
-
-``` python
-import os.path
-from deployer import Deployer
+By default is also runs the `templates/bootstrap-nsp-script.sh` on the newly created server. (Installs salt)
 
 
-# This script expects that the following environment vars are set:
-#
-# AZURE_TENANT_ID: with your Azure Active Directory tenant id or domain
-# AZURE_CLIENT_ID: with your Azure Active Directory Application Client ID
-# AZURE_CLIENT_SECRET: with your Azure Active Directory Application Secret
-
-my_subscription_id = os.environ.get('AZURE_SUBSCRIPTION_ID', '11111111-1111-1111-1111-111111111111')   # your Azure Subscription Id
-my_resource_group = 'azure-python-deployment-sample'            # the resource group for deployment
-my_pub_ssh_key_path = os.path.expanduser('~/.ssh/id_rsa.pub')   # the path to your rsa public key file
-
-msg = "\nInitializing the Deployer class with subscription id: {}, resource group: {}" \
-    "\nand public key located at: {}...\n\n"
-msg = msg.format(my_subscription_id, my_resource_group, my_pub_ssh_key_path)
-print(msg)
-
-# Initialize the deployer class
-deployer = Deployer(my_subscription_id, my_resource_group, my_pub_ssh_key_path)
-
-print("Beginning the deployment... \n\n")
-# Deploy the template
-my_deployment = deployer.deploy()
-
-print("Done deploying!!\n\nYou can connect via: `ssh azureSample@{}.westus.cloudapp.azure.com`".format(deployer.dns_label_prefix))
-
-# Destroy the resource group which contains the deployment
-# deployer.destroy()
-```
 
 ### What is this deployer.py Doing?
 
 The [Deployer class](https://github.com/azure-samples/resource-manager-python-template-deployment/blob/master/lib/deployer.py) consists of the following:
-
-``` python
-"""A deployer class to deploy a template on Azure"""
-import os.path
-import json
-from haikunator import Haikunator
-from azure.common.credentials import ServicePrincipalCredentials
-from azure.mgmt.resource import ResourceManagementClient
-from azure.mgmt.resource.resources.models import DeploymentMode
-
-class Deployer(object):
-    """ Initialize the deployer class with subscription, resource group and public key.
-
-    :raises IOError: If the public key path cannot be read (access or not exists)
-    :raises KeyError: If AZURE_CLIENT_ID, AZURE_CLIENT_SECRET or AZURE_TENANT_ID env
-        variables or not defined
-    """
-    name_generator = Haikunator()
-
-    def __init__(self, subscription_id, resource_group, pub_ssh_key_path='~/.ssh/id_rsa.pub'):
-        self.subscription_id = subscription_id
-        self.resource_group = resource_group
-        self.dns_label_prefix = self.name_generator.haikunate()
-
-        pub_ssh_key_path = os.path.expanduser(pub_ssh_key_path)
-        # Will raise if file not exists or not enough permission
-        with open(pub_ssh_key_path, 'r') as pub_ssh_file_fd:
-            self.pub_ssh_key = pub_ssh_file_fd.read()
-
-        self.credentials = ServicePrincipalCredentials(
-            client_id=os.environ['AZURE_CLIENT_ID'],
-            secret=os.environ['AZURE_CLIENT_SECRET'],
-            tenant=os.environ['AZURE_TENANT_ID']
-        )
-        self.client = ResourceManagementClient(self.credentials, self.subscription_id)
-
-    def deploy(self):
-        """Deploy the template to a resource group."""
-        self.client.resource_groups.create_or_update(
-            self.resource_group,
-            {
-                'location':'westus'
-            }
-        )
-
-        template_path = os.path.join(os.path.dirname(__file__), 'templates', 'template.json')
-        with open(template_path, 'r') as template_file_fd:
-            template = json.load(template_file_fd)
-
-        parameters = {
-            'sshKeyData': self.pub_ssh_key,
-            'vmName': 'azure-deployment-sample-vm',
-            'dnsLabelPrefix': self.dns_label_prefix
-        }
-        parameters = {k: {'value': v} for k, v in parameters.items()}
-
-        deployment_properties = {
-            'mode': DeploymentMode.incremental,
-            'template': template,
-            'parameters': parameters
-        }
-
-        deployment_async_operation = self.client.deployments.create_or_update(
-            self.resource_group,
-            'azure-sample',
-            deployment_properties
-        )
-        deployment_async_operation.wait()
-
-    def destroy(self):
-        """Destroy the given resource group"""
-        self.client.resource_groups.delete(self.resource_group)
-```
 
 The `__init__` method initializes the class with the subscription, resource group and public key. The method also fetches
 the Azure Active Directory bearer token, which will be used in each HTTP request to the Azure Management API. The class
@@ -236,4 +130,4 @@ Done deploying!!
 You can connect via: `ssh azureSample@damp-dew-79.westus.cloudapp.azure.com`
 ```
 
-You should be able to run `ssh azureSample@{your dns value}.westus.cloudapp.azure.com` to connect to your new VM.
+You should be able to run `ssh azureSample@{your dns value}.{location}.cloudapp.azure.com` to connect to your new VM.
