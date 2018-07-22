@@ -1,53 +1,28 @@
 {
   "$schema": "http://schema.management.azure.com/schemas/2014-04-01-preview/deploymentTemplate.json",
   "contentVersion": "1.0.0.0",
+
   "parameters": {
-    "adminUserName": {
-      "type": "string",
-      "defaultValue": "azureSample",
-      "metadata": {
-        "description": "User name for the Virtual Machine."
-      }
-    },
-    "sshKeyData": { "type": "string", "metadata": { "description": "SSH rsa public key file as a string." }
-    },
-    "dnsLabelPrefix": {
-      "type": "string",
-      "metadata": { "description": "Unique DNS Name for the Public IP used to access the Virtual Machine." }
-    },
-    "vmSize": { "type": "string", "defaultValue": "Standard_D2s_v3", "metadata": { "description": "Size of the VM" } 
-              },
+    "adminUserName": { "type": "string", "defaultValue": "azureSample"
+                      ,"metadata": { "description": "User name for the Virtual Machine."} },
+    "sshKeyData": { "type": "string", "metadata": { "description": "SSH rsa public key file as a string." } },
+    "bootstrapScriptBase64":  { "type": "string", "metadata": { "description": "shell script encoded base64" } },
+    "dnsLabelPrefix": { "type": "string"
+                       ,"metadata": { "description": "Unique DNS Name for the Public IP used to access the Virtual Machine." } },
+    "vmSize": { "type": "string", "defaultValue": "Standard_D2s_v3", "metadata": { "description": "Size of the VM" } },
     "vmName": { "type": "string", "metadata": { "description": "Name of the VM" } },  
     "vmEnvironment": { "type": "string", "defaultValue": "INF02", "metadata": { "description": "Environment e.g. DEV01 " }  },
     "imagePublisher": { "type": "string", "defaultValue": "canonical", "metadata": { "description": "Name of the image publisher" }  },
     "imageOffer": { "type": "string", "defaultValue": "ubuntuserver", "metadata": { "description": "Name of the image offer" }  },
     "imageSku": { "type": "string", "defaultValue": "16.04-LTS", "metadata": { "description": "Name of the image sku" } },
-    "imageVersion": {
-      "type": "string",
-      "defaultValue": "latest",
-      "metadata": {
-        "description": "Name of the image sku"
-      }
+    "imageVersion": { "type": "string", "defaultValue": "latest", "metadata": { "description": "Name of the image sku" }  },
+    "subnetName": { "type": "string", "defaultValue": "[concat(parameters('vmEnvironment'), '-SUBNET')]"
+                   ,"metadata": { "description": "Name of the subnet" } },
+    "virtualNetworkName": { "type": "string", "defaultValue": "[concat(parameters('vmEnvironment'), '-VNET')]"
+                           ,"metadata": { "description": "Name of the virtual network" } },
+    "availabilitySet_name": { "defaultValue": "[concat(parameters('vmEnvironment'), '-AvailabilitySet')]", "type": "String" }
     },
-    "subnetName": {
-      "type": "string",
-      "defaultValue": "[concat(parameters('vmEnvironment'), '-SUBNET')]",
-      "metadata": {
-        "description": "Name of the subnet"
-      }
-    },
-    "virtualNetworkName": {
-      "type": "string",
-      "defaultValue": "[concat(parameters('vmEnvironment'), '-VNET')]",
-      "metadata": {
-        "description": "Name of the virtual network"
-      }
-    },
-    "availabilitySet_name": {
-            "defaultValue": "[concat(parameters('vmEnvironment'), '-AvailabilitySet')]",
-            "type": "String"
-        }
-  },
+
   "variables": {
     "storageAccountName-INFO": "Storage account between 3 and 24 characters in len only numbers and lower-case letters.",
     "storageAccountName": "[concat(parameters('vmEnvironment'),'disk',uniquestring(resourceGroup().id))]",
@@ -264,12 +239,11 @@
         "publisher": "Microsoft.Azure.Extensions",
         "type": "CustomScript",
         "typeHandlerVersion": "2.0",
-        "settings": {
-          "commandToExecute": "python -c 'import urllib; print urllib.urlopen(\"https://bootstrap.saltstack.com\").read()' > bootstrap-salt.sh ; sudo sh bootstrap-salt.sh git v2018.3.2"
-        }
+        "protectedSettings": {
+          "script": "[parameters('bootstrapScriptBase64')]"
+          }
       }
     }
-
   ]
 }
 

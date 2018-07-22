@@ -7,6 +7,7 @@ from azure.mgmt.resource import ResourceManagementClient
 from azure.mgmt.resource.resources.models import DeploymentMode
 #PES
 from azure.common.client_factory import get_client_from_cli_profile
+import base64
 
 class Deployer(object):
     """ Initialize the deployer class with subscription, resource group and public key.
@@ -17,16 +18,21 @@ class Deployer(object):
     """
     name_generator = Haikunator()
 
-    def __init__(self, subscription_id, resource_group, location, pub_ssh_key_path='~/.ssh/id_rsa.pub'):
+    def __init__(self, subscription_id, resource_group, location,bootstrapfile, vm_name="pieter03", pub_ssh_key_path='~/.ssh/id_rsa.pub'):
         self.subscription_id = subscription_id
         self.resource_group = resource_group
         self.location = location
         self.dns_label_prefix = self.name_generator.haikunate()
+        self.vm_name = vm_name
 
         pub_ssh_key_path = os.path.expanduser(pub_ssh_key_path)
         # Will raise if file not exists or not enough permission
         with open(pub_ssh_key_path, 'r') as pub_ssh_file_fd:
             self.pub_ssh_key = pub_ssh_file_fd.read()
+        with open(os.path.abspath(bootstrapfile), 'r') as b_boot:
+            script = b_boot.read()
+        # 1st encode() string(utf8) to binary, and final decode() is b'' back to string.
+        self.bootstrapScriptBase64 = base64.b64encode(script.encode()).decode()
 
         def get_resource_client():
             from azure.mgmt.resource import ResourceManagementClient
@@ -62,9 +68,11 @@ class Deployer(object):
 
         parameters = {
             'sshKeyData': self.pub_ssh_key,
-            'vmName': 'NSPTEST01',
+            'vmName': self.vm_name,
             'dnsLabelPrefix': self.dns_label_prefix,
-            'adminUserName': 'pieter'
+            'adminUserName': 'pieter',
+            'bootstrapScriptBase64' : self.bootstrapScriptBase64
+
         }
         parameters.update(args) #add args.
         parameters = {k: {'value': v} for k, v in parameters.items()}

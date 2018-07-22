@@ -27,7 +27,8 @@ def run(args):
     deployer = Deployer(subscription_id=args.my_subscription_id,
                         resource_group=args.my_resource_group,
                         pub_ssh_key_path=args.my_pub_ssh_key_path,
-                        location="australiaeast")
+                        location="australiaeast",
+                        bootstrapfile=args.bootstrapfile)
 
     logging.info("Beginning the deployment... \n\n")
     # Deploy the template
@@ -67,7 +68,10 @@ def main(argv):
                         default=os.path.expanduser('~/.ssh/id_rsa.pub'),
                         help="initial ssh key rsa public key file for vm login."
                         )
-
+    parser.add_argument("--bootstrapfile",
+                        default=('templates/bootstrap-nsp-script.sh'),
+                        help="bootstrap salt install."
+                        )
     args = parser.parse_args()
 
     if args.verbose > 0:
@@ -81,7 +85,7 @@ def main(argv):
     logging.debug(f"{argv[0]} args is {args}")
 
     run(args) #args also parsed to azure template.json
-    
+ 
 if __name__ == "__main__":
     main(sys.argv)
 
