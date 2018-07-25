@@ -29,7 +29,7 @@
     "location": "[resourceGroup().location]",
     "addressPrefix": "10.0.0.0/16",
     "subnetPrefix": "10.0.0.0/24",
-    "nicName": "[concat(parameters('vmName'), '-NIC')]",
+    "nicName": "[concat(parameters('vmName'), '-eth0')]",
     "osDiskName": "[concat(parameters('vmName'), '-osdisk')]",
     "publicIPAddressName": "[concat(parameters('vmName'), '-PublicIP')]",
     "publicIPAddressType": "Dynamic",

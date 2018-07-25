@@ -18,17 +18,24 @@ class Deployer(object):
     """
     name_generator = Haikunator()
 
-    def __init__(self, subscription_id, resource_group, location,bootstrapfile, vm_name="pieter03", pub_ssh_key_path='~/.ssh/id_rsa.pub'):
+    def __init__(self, subscription_id, resource_group, location,bootstrapfile
+                       , vm_name, virtual_network_name
+                       , admin_user_name, pub_ssh_key_paths=['~/.ssh/id_rsa.pub']):
         self.subscription_id = subscription_id
         self.resource_group = resource_group
         self.location = location
         self.dns_label_prefix = self.name_generator.haikunate()
         self.vm_name = vm_name
+        self.admin_user_name = admin_user_name
+        self.virtual_network_name = virtual_network_name
 
-        pub_ssh_key_path = os.path.expanduser(pub_ssh_key_path)
         # Will raise if file not exists or not enough permission
-        with open(pub_ssh_key_path, 'r') as pub_ssh_file_fd:
-            self.pub_ssh_key = pub_ssh_file_fd.read()
+        self.pub_ssh_key = ""
+        for pub_ssh_key_path in  pub_ssh_key_paths:
+            pub_ssh_key_path = os.path.expanduser(pub_ssh_key_path)
+            with open(pub_ssh_key_path, 'r') as pub_ssh_file_fd:
+                self.pub_ssh_key = self.pub_ssh_key +  pub_ssh_file_fd.read()
+        self.pub_ssh_key = self.pub_ssh_key.strip()
         with open(os.path.abspath(bootstrapfile), 'r') as b_boot:
             script = b_boot.read()
         # 1st encode() string(utf8) to binary, and final decode() is b'' back to string.
@@ -70,8 +77,10 @@ class Deployer(object):
             'sshKeyData': self.pub_ssh_key,
             'vmName': self.vm_name,
             'dnsLabelPrefix': self.dns_label_prefix,
-            'adminUserName': 'pieter',
-            'bootstrapScriptBase64' : self.bootstrapScriptBase64
+            'bootstrapScriptBase64' : self.bootstrapScriptBase64,
+            'adminUserName': self.admin_user_name,
+            'vmEnvironment': self.resource_group,
+            'virtualNetworkName' : self.virtual_network_name
 
         }
         parameters.update(args) #add args.

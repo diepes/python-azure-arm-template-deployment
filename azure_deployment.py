@@ -26,16 +26,20 @@ def run(args):
     # Initialize the deployer class
     deployer = Deployer(subscription_id=args.my_subscription_id,
                         resource_group=args.my_resource_group,
-                        pub_ssh_key_path=args.my_pub_ssh_key_path,
+                        pub_ssh_key_paths= [ args.my_pub_ssh_key_path ], #, "~/.ssh/id_rsa.pub-sham-2018"
+                        admin_user_name=args.admin_user_name,
                         location="australiaeast",
-                        bootstrapfile=args.bootstrapfile)
+                        bootstrapfile=args.bootstrapfile,
+                        vm_name=args.vm_name,
+                        virtual_network_name=args.virtual_network_name)
+    ##  
 
     logging.info("Beginning the deployment... \n\n")
     # Deploy the template
 
-    my_deployment = deployer.deploy()
+    my_deployment = deployer.deploy(  ) #vars makes namespace iterable. vars( args ) cant pass does not match template.
 
-    logging.warn("Done deploying!!\n\nYou can connect via: `ssh {}@{}.australiaeast.cloudapp.azure.com`".format(args.adminUserName,deployer.dns_label_prefix))
+    logging.warn("Done deploying!!\n\nYou can connect via: `ssh {}@{}.australiaeast.cloudapp.azure.com`".format(args.admin_user_name,deployer.dns_label_prefix))
     logging.debug(str(deployer))
     # Destroy the resource group which contains the deployment
     # deployer.destroy()
@@ -59,9 +63,15 @@ def main(argv):
                         default='pieter-rg',
                         help="the azure resource group(RG) to deploy the vm in."
                         )
-    parser.add_argument("--adminUserName", dest="adminUserName" ,nargs='?',
-                        default='pieter',
+    parser.add_argument("--adminUserName", dest="admin_user_name" ,nargs='?',
+                        default='admin9sp',
                         help="the initial ssh user."
+                        )
+    parser.add_argument("--vm_name", dest="vm_name" ,nargs='?',
+                        help="the azure VM resource name."
+                        )
+    parser.add_argument("--virtual_network_name" ,nargs='?',
+                        help="the azure VNET to use."
                         )
 
     parser.add_argument("--my_pub_ssh_key_path",
@@ -72,6 +82,7 @@ def main(argv):
                         default=('templates/bootstrap-nsp-script.sh'),
                         help="bootstrap salt install."
                         )
+
     args = parser.parse_args()
 
     if args.verbose > 0:
