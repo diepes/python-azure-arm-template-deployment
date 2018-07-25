@@ -1,7 +1,8 @@
 ---
 services: azure-resource-manager
 platforms: python
-author: pieter.e.smit 
+author: pieter.e.smit
+original: nothing to commit, working tree clean
 ---
 
 # Deploy an SSH Enabled VM with a Template in Python
