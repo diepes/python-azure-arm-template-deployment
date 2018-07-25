@@ -2,7 +2,7 @@
 services: azure-resource-manager
 platforms: python
 author: pieter.e.smit
-original: nothing to commit, working tree clean
+original-fork: 2018-07 Azure-Samples/resource-manager-python-template-deployment
 ---
 
 # Deploy an SSH Enabled VM with a Template in Python
