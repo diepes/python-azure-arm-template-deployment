@@ -85,7 +85,7 @@ def main(argv):
     logging.debug(f"{argv[0]} args is {args}")
 
     run(args) #args also parsed to azure template.json
- 
+
 if __name__ == "__main__":
     main(sys.argv)
 
