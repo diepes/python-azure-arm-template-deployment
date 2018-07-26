@@ -73,8 +73,8 @@ def main(argv):
                         help="azure datacenter location."
                         )
     parser.add_argument("--vmSize", nargs='?'
-                        ,default='Standard_D2s_v3'
-                        ,help="azure vm size to use. "
+                        ,default='Standard_E4s_v3'
+                        ,help="azure vm size to use. 'Standard_D2s_v3'-2cpu-8gig-$136 , 'Standard_E2s_v3'-2cpu-16gig-$174, 'Standard_E4s_v3'-4cpu-32gig-$344 "
                         )
     parser.add_argument("--vmName", nargs='?'
                         ,help="the minion ID.upper() 15char, and azure VM resource name."
