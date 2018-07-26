@@ -105,11 +105,10 @@ class Deployer(object):
                               ,salt_key_pem=salt_key_pem
                               ,salt_key_pub=salt_key_pub
                               )
-        print();print(script);print();print(salt_key)
+        print();print(script);print()
         #base64 encode bootstrap and add to azure arm template.
         bootstrapScriptBase64 = base64.b64encode( script.encode() ).decode()
         print(len(bootstrapScriptBase64))
-        exit(1)
 
         template_path = os.path.join(os.path.dirname(__file__), 'templates', 'template.json')
         with open(template_path, 'r') as template_file_fd:
