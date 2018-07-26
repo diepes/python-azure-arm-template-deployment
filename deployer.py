@@ -1,7 +1,8 @@
 """A deployer class to deploy a template on Azure"""
 import os.path
 import json
-from haikunator import Haikunator
+import yaml
+#from haikunator import Haikunator
 from azure.common.credentials import ServicePrincipalCredentials
 from azure.mgmt.resource import ResourceManagementClient
 from azure.mgmt.resource.resources.models import DeploymentMode
@@ -16,30 +17,13 @@ class Deployer(object):
     :raises KeyError: If AZURE_CLIENT_ID, AZURE_CLIENT_SECRET or AZURE_TENANT_ID env
         variables or not defined
     """
-    name_generator = Haikunator()
 
-    def __init__(self, subscription_id, resource_group, location,bootstrapfile
-                       , vm_name, virtual_network_name
-                       , admin_user_name, pub_ssh_key_paths=['~/.ssh/id_rsa.pub']):
+
+
+    def __init__(self, subscription_id, resource_group, location ):
         self.subscription_id = subscription_id
         self.resource_group = resource_group
         self.location = location
-        self.dns_label_prefix = self.name_generator.haikunate()
-        self.vm_name = vm_name
-        self.admin_user_name = admin_user_name
-        self.virtual_network_name = virtual_network_name
-
-        # Will raise if file not exists or not enough permission
-        self.pub_ssh_key = ""
-        for pub_ssh_key_path in  pub_ssh_key_paths:
-            pub_ssh_key_path = os.path.expanduser(pub_ssh_key_path)
-            with open(pub_ssh_key_path, 'r') as pub_ssh_file_fd:
-                self.pub_ssh_key = self.pub_ssh_key +  pub_ssh_file_fd.read()
-        self.pub_ssh_key = self.pub_ssh_key.strip()
-        with open(os.path.abspath(bootstrapfile), 'r') as b_boot:
-            script = b_boot.read()
-        # 1st encode() string(utf8) to binary, and final decode() is b'' back to string.
-        self.bootstrapScriptBase64 = base64.b64encode(script.encode()).decode()
 
         def get_resource_client():
             from azure.mgmt.resource import ResourceManagementClient
@@ -69,21 +53,63 @@ class Deployer(object):
             }
         )
 
+        # Will raise if file not exists or not enough permission
+        pub_ssh_key = ""
+        for pub_ssh_key_path in [ args['my_pub_ssh_key_path'] ]:
+            pub_ssh_key_path = os.path.expanduser(pub_ssh_key_path)
+            with open(pub_ssh_key_path, 'r') as pub_ssh_file_fd:
+                pub_ssh_key = pub_ssh_key +  pub_ssh_file_fd.read()
+        pub_ssh_key = pub_ssh_key.strip()
+        print("ssh keys:  ",pub_ssh_key)
+
+
+        #Generate bootstrap file with minion config
+        with open(os.path.abspath(args['bootstrapfile']), 'r') as b_boot:
+            script = b_boot.read()
+
+        with open(os.path.abspath(args['salt_map']), 'r') as b_salt:
+            salt_map = yaml.load(b_salt)
+            print("salt:",salt_map)
+            for salt_profile,v in salt_map.items():  ## CPU5_RAM8 : [{ ALL02 ...
+                for salt_vms in v:
+                    for salt_vm_id,salt_conf in salt_vms.items():
+                        print("salt_vm_id:",salt_vm_id)
+                        print("salt_conf:",salt_conf)
+                        if salt_vm_id != args['vmName']: print(f"Warning vmName:{args['vmName']} != salt_map:{salt_vm_id}")
+                        salt_minion = salt_conf['minion']
+                        salt_grains = salt_conf['grains']
+                        #print(f"minion: \n{ yaml.dump(salt_minion,default_flow_style=False) }\ngrains: \n{yaml.dump(salt_grains, default_flow_style=False)}")
+                        break
+                    break
+                break
+            #
+        # 1st encode() string(utf8) to binary, and final decode() is b'' back to string.
+        script = script.format(salt_minion=yaml.dump(salt_minion,default_flow_style=False)
+                              ,salt_grains=yaml.dump(salt_grains, default_flow_style=False) )
+        print();print(script)
+        #base64 encode bootstrap and add to azure arm template.
+        bootstrapScriptBase64 = base64.b64encode( script.encode() ).decode()
+        print(len(bootstrapScriptBase64))
+        #exit(1)
+
         template_path = os.path.join(os.path.dirname(__file__), 'templates', 'template.json')
         with open(template_path, 'r') as template_file_fd:
             template = json.load(template_file_fd)
-
+        print(template['parameters'].keys())
+        print()
+        print(args.keys())
         parameters = {
-            'sshKeyData': self.pub_ssh_key,
-            'vmName': self.vm_name,
-            'dnsLabelPrefix': self.dns_label_prefix,
-            'bootstrapScriptBase64' : self.bootstrapScriptBase64,
-            'adminUserName': self.admin_user_name,
+            'sshKeyData': pub_ssh_key,
+            'dnsLabelPrefix':  args['dns_label_prefix'],
+            'bootstrapScriptBase64' : bootstrapScriptBase64,
             'vmEnvironment': self.resource_group,
-            'virtualNetworkName' : self.virtual_network_name
 
         }
-        parameters.update(args) #add args.
+        #Add all matching args values to parameters.
+        for k,v in args.items():
+            if k in template['parameters']:
+                print("match args key=",k,":",v)
+                parameters[k]=v
         parameters = {k: {'value': v} for k, v in parameters.items()}
 
         deployment_properties = {
@@ -91,7 +117,7 @@ class Deployer(object):
             'template': template,
             'parameters': parameters
         }
-
+        #exit(0)
         deployment_async_operation = self.client.deployments.create_or_update(
             self.resource_group,
             'azure-sample',

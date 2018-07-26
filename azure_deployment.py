@@ -26,27 +26,28 @@ def run(args):
     # Initialize the deployer class
     deployer = Deployer(subscription_id=args.my_subscription_id,
                         resource_group=args.my_resource_group,
-                        pub_ssh_key_paths= [ args.my_pub_ssh_key_path ], #, "~/.ssh/id_rsa.pub-sham-2018"
-                        admin_user_name=args.admin_user_name,
-                        location="australiaeast",
-                        bootstrapfile=args.bootstrapfile,
-                        vm_name=args.vm_name,
-                        virtual_network_name=args.virtual_network_name)
+                        location=args.location
+                        )
     ##  
 
     logging.info("Beginning the deployment... \n\n")
     # Deploy the template
+    args.dns_label_prefix = args.vmName.lower()    ##re ^[a-z][a-z0-9-]{1,61}[a-z0-9]$
+    my_deployment = deployer.deploy( vars(args) )
 
-    my_deployment = deployer.deploy(  ) #vars makes namespace iterable. vars( args ) cant pass does not match template.
-
-    logging.warn("Done deploying!!\n\nYou can connect via: `ssh {}@{}.australiaeast.cloudapp.azure.com`".format(args.admin_user_name,deployer.dns_label_prefix))
+    logging.warn("Done deploying!!\n\nYou can connect via: `ssh {}@{}.australiaeast.cloudapp.azure.com`".format(args.adminUserName,args.dns_label_prefix))
     logging.debug(str(deployer))
     # Destroy the resource group which contains the deployment
     # deployer.destroy()
 
 def main(argv):
     json_template = ''
-    parser = argparse.ArgumentParser()
+    example_text = '''example:
+
+ # time ./azure_deployment.py --resource_group DEV01 --vmName ALL01DEV01AEA01 --rgVNET VNET-NONPRD --virtualNetworkName VNET-NONPRD 
+                   '''
+
+    parser = argparse.ArgumentParser(epilog=example_text)
     parser.add_argument("-v", "--verbose", action="count",
                         default=0,
                         help="increase output verbosity"
@@ -61,17 +62,28 @@ def main(argv):
                         )
     parser.add_argument("--resource_group", dest="my_resource_group" ,nargs='?',
                         default='pieter-rg',
-                        help="the azure resource group(RG) to deploy the vm in."
+                        help="the azure resource group(RG) to deploy the vm in. e.g. DEV01"
                         )
-    parser.add_argument("--adminUserName", dest="admin_user_name" ,nargs='?',
+    parser.add_argument("--adminUserName", nargs='?',
                         default='admin9sp',
                         help="the initial ssh user."
                         )
-    parser.add_argument("--vm_name", dest="vm_name" ,nargs='?',
+    parser.add_argument("--location", nargs='?',
+                        default='australiaeast',
+                        help="azure datacenter location."
+                        )
+    parser.add_argument("--vmSize", nargs='?',
+                        default='Standard_D2s_v3',
+                        help="azure vm size to use."
+                        )
+    parser.add_argument("--vmName", nargs='?',
                         help="the azure VM resource name."
                         )
-    parser.add_argument("--virtual_network_name" ,nargs='?',
-                        help="the azure VNET to use."
+    parser.add_argument("--rgVNET" ,nargs='?',
+                        help="the azure resourceGroup VNET to use."
+                        )
+    parser.add_argument("--virtualNetworkName" ,nargs='?',
+                        help="the azure resourceGroup VNET to use."
                         )
 
     parser.add_argument("--my_pub_ssh_key_path",
@@ -81,6 +93,10 @@ def main(argv):
     parser.add_argument("--bootstrapfile",
                         default=('templates/bootstrap-nsp-script.sh'),
                         help="bootstrap salt install."
+                        )
+    parser.add_argument("--salt_map",nargs='?',
+                        default=('/etc/salt/cloud.maps.d/AEA01/azure_pieter-INF.conf'),
+                        help="salt vm config."
                         )
 
     args = parser.parse_args()

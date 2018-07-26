@@ -7,19 +7,20 @@
                       ,"metadata": { "description": "User name for the Virtual Machine."} },
     "sshKeyData": { "type": "string", "metadata": { "description": "SSH rsa public key file as a string." } },
     "bootstrapScriptBase64":  { "type": "string", "metadata": { "description": "shell script encoded base64" } },
-    "dnsLabelPrefix": { "type": "string"
-                       ,"metadata": { "description": "Unique DNS Name for the Public IP used to access the Virtual Machine." } },
+    "dnsLabelPrefix": { "type": "string" ,"metadata": 
+        { "description": "Unique DNS Name for the Public IP used to access the Virtual Machine." } },
     "vmSize": { "type": "string", "defaultValue": "Standard_D2s_v3", "metadata": { "description": "Size of the VM" } },
     "vmName": { "type": "string", "metadata": { "description": "Name of the VM" } },  
     "vmEnvironment": { "type": "string", "defaultValue": "INF02", "metadata": { "description": "Environment e.g. DEV01 " }  },
+    "rgVNET" : { "type": "string", "defaultValue": "[concat(parameters('vmEnvironment'), '')]"
+                   ,"metadata": { "description": "Resource group containing the VNET, default DEV01" } },
     "imagePublisher": { "type": "string", "defaultValue": "canonical", "metadata": { "description": "Name of the image publisher" }  },
     "imageOffer": { "type": "string", "defaultValue": "ubuntuserver", "metadata": { "description": "Name of the image offer" }  },
     "imageSku": { "type": "string", "defaultValue": "16.04-LTS", "metadata": { "description": "Name of the image sku" } },
     "imageVersion": { "type": "string", "defaultValue": "latest", "metadata": { "description": "Name of the image sku" }  },
     "subnetName": { "type": "string", "defaultValue": "[concat(parameters('vmEnvironment'), '-SUBNET')]"
                    ,"metadata": { "description": "Name of the subnet" } },
-    "virtualNetworkName": { "type": "string", "defaultValue": "[concat(parameters('vmEnvironment'), '-VNET')]"
-                           ,"metadata": { "description": "Name of the virtual network" } },
+    "virtualNetworkName": { "type": "string","metadata": { "description": "Name of the virtual network, e.g. VNET-NONPRD" } },
     "availabilitySet_name": { "defaultValue": "[concat(parameters('vmEnvironment'), '-AvailabilitySet')]", "type": "String" }
     },
 
@@ -36,7 +37,8 @@
     "storageAccountType": "Standard_LRS",
     "networkSecurityGroupName": "[concat(parameters('vmName'), '-NSG')]",
     "sshKeyPath": "[concat('/home/',parameters('adminUsername'),'/.ssh/authorized_keys')]",
-    "vnetID": "[resourceId('Microsoft.Network/virtualNetworks', parameters('virtualNetworkName'))]",
+    "debug01": "/subscriptions/cfdb116f-fc7d-4e75-9630-9d1da11b73dd/resourceGroups/DEV01/providers/Microsoft.Network/virtualNetworks/VNET-NONPRD/subnets/DEV01-SUBNET",
+    "vnetID": "[resourceId(parameters('rgVNET'), 'Microsoft.Network/virtualNetworks', parameters('virtualNetworkName'))]",
     "subnetRef": "[concat(variables('vnetID'),'/subnets/',parameters('subnetName'))]",
     "apiVersion": "2015-06-15"
   },
@@ -86,41 +88,14 @@
         }
       }
     },
-    {
-      "apiVersion": "[variables('apiVersion')]",
-      "type": "Microsoft.Network/virtualNetworks",
-      "name": "[parameters('virtualNetworkName')]",
-      "location": "[variables('location')]",
-      "dependsOn": [
-        "[concat('Microsoft.Network/networkSecurityGroups/', variables('networkSecurityGroupName'))]"
-      ],
-      "properties": {
-        "addressSpace": {
-          "addressPrefixes": [
-            "[variables('addressPrefix')]"
-          ]
-        },
-        "subnets": [
-          {
-            "name": "[parameters('subnetName')]",
-            "properties": {
-              "addressPrefix": "[variables('subnetPrefix')]",
-              "networkSecurityGroup": {
-                "id": "[resourceId('Microsoft.Network/networkSecurityGroups', variables('networkSecurityGroupName'))]"
-              }
-            }
-          }
-        ]
-      }
-    },
+
     {
       "apiVersion": "[variables('apiVersion')]",
       "type": "Microsoft.Network/networkInterfaces",
       "name": "[variables('nicName')]",
       "location": "[variables('location')]",
       "dependsOn": [
-        "[concat('Microsoft.Network/publicIPAddresses/', variables('publicIPAddressName'))]",
-        "[concat('Microsoft.Network/virtualNetworks/', parameters('virtualNetworkName'))]"
+        "[concat('Microsoft.Network/publicIPAddresses/', variables('publicIPAddressName'))]"
       ],
       "properties": {
         "ipConfigurations": [
