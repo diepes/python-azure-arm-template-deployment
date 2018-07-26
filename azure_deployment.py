@@ -72,12 +72,13 @@ def main(argv):
                         default='australiaeast',
                         help="azure datacenter location."
                         )
-    parser.add_argument("--vmSize", nargs='?',
-                        default='Standard_D2s_v3',
-                        help="azure vm size to use."
+    parser.add_argument("--vmSize", nargs='?'
+                        ,default='Standard_D2s_v3'
+                        ,help="azure vm size to use. "
                         )
-    parser.add_argument("--vmName", nargs='?',
-                        help="the azure VM resource name."
+    parser.add_argument("--vmName", nargs='?'
+                        ,help="the minion ID.upper() 15char, and azure VM resource name."
+                        , type=lambda s: s[0:14]+s[14]
                         )
     parser.add_argument("--rgVNET" ,nargs='?',
                         help="the azure resourceGroup VNET to use."
@@ -98,7 +99,10 @@ def main(argv):
                         default=('/etc/salt/cloud.maps.d/AEA01/azure_pieter-INF.conf'),
                         help="salt vm config."
                         )
-
+    parser.add_argument("--imageSku" , nargs='?',
+                        default=('14.04.5-LTS'),
+                        help="Linux image to load e.g. '14.04.5-LTS'  ,  '16.04-LTS'  "
+                        )
     args = parser.parse_args()
 
     if args.verbose > 0:

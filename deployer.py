@@ -9,6 +9,7 @@ from azure.mgmt.resource.resources.models import DeploymentMode
 #PES
 from azure.common.client_factory import get_client_from_cli_profile
 import base64
+import subprocess
 
 class Deployer(object):
     """ Initialize the deployer class with subscription, resource group and public key.
@@ -67,6 +68,7 @@ class Deployer(object):
         with open(os.path.abspath(args['bootstrapfile']), 'r') as b_boot:
             script = b_boot.read()
 
+        #Read minion config from /etc/salt/cloud......
         with open(os.path.abspath(args['salt_map']), 'r') as b_salt:
             salt_map = yaml.load(b_salt)
             print("salt:",salt_map)
@@ -75,7 +77,11 @@ class Deployer(object):
                     for salt_vm_id,salt_conf in salt_vms.items():
                         print("salt_vm_id:",salt_vm_id)
                         print("salt_conf:",salt_conf)
-                        if salt_vm_id != args['vmName']: print(f"Warning vmName:{args['vmName']} != salt_map:{salt_vm_id}")
+                        if salt_vm_id != args['vmName']:
+                            print(f"Warning vmName:{args['vmName']} != salt_map:{salt_vm_id}")
+                            salt_id=args['vmName'].upper()
+                            salt_conf['minion']['id']=salt_id
+
                         salt_minion = salt_conf['minion']
                         salt_grains = salt_conf['grains']
                         #print(f"minion: \n{ yaml.dump(salt_minion,default_flow_style=False) }\ngrains: \n{yaml.dump(salt_grains, default_flow_style=False)}")
@@ -83,14 +89,22 @@ class Deployer(object):
                     break
                 break
             #
+        #Generate a minion pre-seed key for use with salt master.
+        subprocess.run(f"sudo salt-key --gen-keys={salt_id} --gen-keys-dir=/tmp")
+        subprocess.run(f"sudo mv /tmp/{salt_id}.pub /etc/salt/pki/master/minions/")
+        with open(os.path.abspath(f'/tmp/{salt_id}.key'), 'r') as f_salt_key:
+            salt_key = f_salt_key.read()
+        subprocess.run(f"sudo rm /tmp/{salt_id}.key")
         # 1st encode() string(utf8) to binary, and final decode() is b'' back to string.
         script = script.format(salt_minion=yaml.dump(salt_minion,default_flow_style=False)
-                              ,salt_grains=yaml.dump(salt_grains, default_flow_style=False) )
-        print();print(script)
+                              ,salt_grains=yaml.dump(salt_grains, default_flow_style=False)
+                              ,salt_key=salt_key
+                              )
+        print();print(script);print();print(salt_key)
         #base64 encode bootstrap and add to azure arm template.
         bootstrapScriptBase64 = base64.b64encode( script.encode() ).decode()
         print(len(bootstrapScriptBase64))
-        #exit(1)
+        exit(1)
 
         template_path = os.path.join(os.path.dirname(__file__), 'templates', 'template.json')
         with open(template_path, 'r') as template_file_fd:
