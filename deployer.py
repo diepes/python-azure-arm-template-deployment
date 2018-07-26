@@ -91,14 +91,19 @@ class Deployer(object):
             #
         #Generate a minion pre-seed key for use with salt master.
         subprocess.run(f"sudo salt-key --gen-keys={salt_id} --gen-keys-dir=/tmp", shell=True)
-        subprocess.run(f"sudo mv /tmp/{salt_id}.pub /etc/salt/pki/master/minions/", shell=True)
-        with open(os.path.abspath(f'/tmp/{salt_id}.key'), 'r') as f_salt_key:
-            salt_key = f_salt_key.read()
-        subprocess.run(f"sudo rm /tmp/{salt_id}.key", shell=True)
+        subprocess.run(f"sudo cp /tmp/{salt_id}.pub /etc/salt/pki/master/minions/", shell=True)
+        with open(os.path.abspath(f'/tmp/{salt_id}.pem'), 'r') as f_salt_key:
+            salt_key_pem = f_salt_key.read()
+        subprocess.run(f"sudo rm /tmp/{salt_id}.pem", shell=True)
+        with open(os.path.abspath(f'/tmp/{salt_id}.pub'), 'r') as f_salt_key:
+            salt_key_pub = f_salt_key.read()
+        subprocess.run(f"sudo rm /tmp/{salt_id}.pub", shell=True)
+
         # 1st encode() string(utf8) to binary, and final decode() is b'' back to string.
         script = script.format(salt_minion=yaml.dump(salt_minion,default_flow_style=False)
                               ,salt_grains=yaml.dump(salt_grains, default_flow_style=False)
-                              ,salt_key=salt_key
+                              ,salt_key_pem=salt_key_pem
+                              ,salt_key_pub=salt_key_pub
                               )
         print();print(script);print();print(salt_key)
         #base64 encode bootstrap and add to azure arm template.

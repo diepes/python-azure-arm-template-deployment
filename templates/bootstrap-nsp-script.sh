@@ -8,8 +8,14 @@ exec 1>/var/log/bootstrap-$(date -I).log 2>&1
 #max size 256 KB
 #base64 encoded into template  cat script.sh | gzip -9 | base 64 -w0
 mkdir -p /etc/salt/pki
-echo '{{ vm['priv_key'] }}' > /etc/salt/pki/minion.pem
-echo '{{ vm['pub_key'] }}' > /etc/salt/pki/minion.pub
+cat > /etc/salt/pki/minion.pem <<EOF
+{salt_key_pem}
+EOF
+
+cat > /etc/salt/pki/minion.pub <<EOF
+{salt_key_pub}
+EOF
+
 
 cat > /etc/salt/minion <<EOF
 {salt_minion}
