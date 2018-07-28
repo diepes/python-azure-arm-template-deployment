@@ -78,20 +78,21 @@ class Deployer(object):
                     for salt_vm_id,salt_conf in salt_vms.items():
                         print("salt_vm_id:",salt_vm_id)
                         print("salt_conf:",salt_conf)
-                        if salt_vm_id != args['vmName']:
-                            print(f"Warning vmName:{args['vmName']} != salt_map:{salt_vm_id}")
+                        if salt_vm_id == args['vmName']:
+                            print(f"INFO vmName:{args['vmName']} found in map.")
                             salt_id=args['vmName'].upper()
                             salt_conf['minion']['id']=salt_id
-                            continue
-                        else:
                             salt_minion = salt_conf['minion']
                             salt_grains = salt_conf['grains']
                             found_config_match = True
                             break
+                        else:
+                            print(f"Warning vmName:{args['vmName']} != salt_map:{salt_vm_id}")
+                            continue
                     if found_config_match: break
                 if found_config_match: break
             if not found_config_match:
-                 print(f" did not find {args['vmName']} in the {args['salt_map']} map file.")
+                 print(f" did not find {args['vmName']} in the {args['salt_map']} map file."
                  exit(1)
             #print(f"minion: \n{ yaml.dump(salt_minion,default_flow_style=False) }\ngrains: \n{yaml.dump(salt_grains, default_flow_style=False)}")
             #
@@ -104,7 +105,7 @@ class Deployer(object):
             salt_key_pub = f_salt_key.read()
         subprocess.run(f"sudo rm /tmp/{salt_id}.pub", shell=True)
         subprocess.run(f"sudo rm /tmp/{salt_id}.pem", shell=True)
-        
+
         # 1st encode() string(utf8) to binary, and final decode() is b'' back to string.
         script = script.format(salt_minion=yaml.dump(salt_minion,default_flow_style=False)
                               ,salt_grains=yaml.dump(salt_grains, default_flow_style=False)
