@@ -25,7 +25,6 @@ def run(args):
 
     # Initialize the deployer class
     deployer = Deployer(subscription_id=args.my_subscription_id,
-                        resource_group=args.my_resource_group,
                         location=args.location
                         )
     ##  
@@ -61,7 +60,6 @@ def main(argv):
                         help="azure subscription_id , default picked from environment AZURE_SUBSCRIPTION_ID"
                         )
     parser.add_argument("--resource_group", dest="my_resource_group" ,nargs='?',
-                        default='pieter-rg',
                         help="the azure resource group(RG) to deploy the vm in. e.g. DEV01"
                         )
     parser.add_argument("--adminUserName", nargs='?',

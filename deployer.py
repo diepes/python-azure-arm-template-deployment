@@ -21,9 +21,8 @@ class Deployer(object):
 
 
 
-    def __init__(self, subscription_id, resource_group, location ):
+    def __init__(self, subscription_id, location ):
         self.subscription_id = subscription_id
-        self.resource_group = resource_group
         self.location = location
 
         def get_resource_client():
@@ -129,9 +128,9 @@ class Deployer(object):
             'sshKeyData': pub_ssh_key,
             'dnsLabelPrefix':  args['dns_label_prefix'],
             'bootstrapScriptBase64' : bootstrapScriptBase64,
-            'vmEnvironment': self.resource_group,
-
+            'vmEnvironment': args['resource_group'],
         }
+        self.resource_group =  args['resource_group']
         #Add all matching args values to parameters.
         for k,v in args.items():
             if k in template['parameters']:
@@ -146,8 +145,8 @@ class Deployer(object):
         }
         #exit(0)
         deployment_async_operation = self.client.deployments.create_or_update(
-            self.resource_group,
-            'azure-sample',
+            args['resource_group'],
+            'azure-python',
             deployment_properties
         )
         deployment_async_operation.wait()
