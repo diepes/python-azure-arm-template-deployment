@@ -98,4 +98,9 @@ OS.EnableFirewall=n
 
 EOF
 
+#restart to enable new config and swap.
+( sleep 20 ; service walinuxagent restart ) &
+
+
 return & exit 0
+

@@ -96,7 +96,7 @@ def main(argv):
                         help="bootstrap salt install."
                         )
     parser.add_argument("--salt_map",nargs='?',
-                        default=('/etc/salt/cloud.maps.d/AEA01/azure_pieter-INF.conf'),
+                        default=('/etc/salt/cloud.maps.d/AEA01/azure_DEV01_05_AEA01.conf'),
                         help="salt vm config."
                         )
     parser.add_argument("--imageSku" , nargs='?',

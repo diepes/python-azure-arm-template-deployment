@@ -72,8 +72,9 @@ class Deployer(object):
         with open(os.path.abspath(args['salt_map']), 'r') as b_salt:
             salt_map = yaml.load(b_salt)
             print("salt:",salt_map)
+            found_config_match = False
             for salt_profile,v in salt_map.items():  ## CPU5_RAM8 : [{ ALL02 ...
-                for salt_vms in v:
+                for salt_vms in v:  #loop through list [ { vm1 : {...}}, { vm2 : {...}}, ]
                     for salt_vm_id,salt_conf in salt_vms.items():
                         print("salt_vm_id:",salt_vm_id)
                         print("salt_conf:",salt_conf)
@@ -81,13 +82,18 @@ class Deployer(object):
                             print(f"Warning vmName:{args['vmName']} != salt_map:{salt_vm_id}")
                             salt_id=args['vmName'].upper()
                             salt_conf['minion']['id']=salt_id
-
-                        salt_minion = salt_conf['minion']
-                        salt_grains = salt_conf['grains']
-                        #print(f"minion: \n{ yaml.dump(salt_minion,default_flow_style=False) }\ngrains: \n{yaml.dump(salt_grains, default_flow_style=False)}")
-                        break
-                    break
-                break
+                            continue
+                        else:
+                            salt_minion = salt_conf['minion']
+                            salt_grains = salt_conf['grains']
+                            found_config_match = True
+                            break
+                    if found_config_match: break
+                if found_config_match: break
+            if not found_config_match:
+                 print(f" did not find {args['vmName']} in the {args['salt_map']} map file.")
+                 exit(1)
+            #print(f"minion: \n{ yaml.dump(salt_minion,default_flow_style=False) }\ngrains: \n{yaml.dump(salt_grains, default_flow_style=False)}")
             #
         #Generate a minion pre-seed key for use with salt master.
         subprocess.run(f"sudo salt-key --gen-keys={salt_id} --gen-keys-dir=/tmp", shell=True)
