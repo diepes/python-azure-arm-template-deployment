@@ -99,7 +99,8 @@ OS.EnableFirewall=n
 EOF
 
 #restart to enable new config and swap.
-( sleep 20 ; service walinuxagent restart ) &
+#add 5 min restart, 20sec not working probably the agent not deployed yet.
+( sleep 300 ; service walinuxagent restart ) &
 
 
 return & exit 0
