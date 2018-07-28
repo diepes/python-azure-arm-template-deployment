@@ -84,7 +84,7 @@ class Deployer(object):
                             salt_conf['minion']['id']=salt_id
                             salt_minion = salt_conf['minion']
                             salt_grains = salt_conf['grains']
-                            print(f"from salt map import keys: {salt_conf['azure']")
+                            print(f"from salt map import keys: {salt_conf['azure']}")
                             args.update( salt_conf['azure'] ) ##Load azure settings from salt pillar.
                             found_config_match = True
                             break
