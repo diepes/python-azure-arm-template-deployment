@@ -47,7 +47,7 @@ def main(argv):
  # time ./azure_deployment.py --resource_group DEV01 --vmName ALL01DEV01AEA01 --rgVNET VNET-NONPRD --virtualNetworkName VNET-NONPRD 
                    '''
 
-    parser = argparse.ArgumentParser(epilog=example_text)
+    parser = argparse.ArgumentParser(epilog=example_text,formatter_class=argparse.ArgumentDefaultsHelpFormatter)
     parser.add_argument("-v", "--verbose", action="count",
                         default=0,
                         help="increase output verbosity"

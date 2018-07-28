@@ -84,6 +84,8 @@ class Deployer(object):
                             salt_conf['minion']['id']=salt_id
                             salt_minion = salt_conf['minion']
                             salt_grains = salt_conf['grains']
+                            print(f"from salt map import keys: {salt_conf['azure']")
+                            args.update( salt_conf['azure'] ) ##Load azure settings from salt pillar.
                             found_config_match = True
                             break
                         else:
@@ -92,7 +94,7 @@ class Deployer(object):
                     if found_config_match: break
                 if found_config_match: break
             if not found_config_match:
-                 print(f" did not find {args['vmName']} in the {args['salt_map']} map file."
+                 print(f" did not find {args['vmName']} in the {args['salt_map']} map file.")
                  exit(1)
             #print(f"minion: \n{ yaml.dump(salt_minion,default_flow_style=False) }\ngrains: \n{yaml.dump(salt_grains, default_flow_style=False)}")
             #
