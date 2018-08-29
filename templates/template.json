@@ -86,6 +86,7 @@
       "name": "[variables('publicIPAddressName')]",
       "apiVersion": "2017-06-01",
       "location": "[variables('rgLocation')]",
+      "resourceGroupName": "[variables('rgNameVnet')]",
       "properties": {
         "publicIPAllocationMethod": "[variables('publicIPAddressType')]",
         "dnsSettings": {
@@ -109,7 +110,7 @@
             "properties": {
               "privateIPAllocationMethod": "Dynamic",
               "publicIPAddress": {
-                "id": "[resourceId( variables('rgNameVnet'), 'Microsoft.Network/publicIPAddresses', variables('publicIPAddressName'))]"
+                "id": "[resourceId(  variables('rgNameVnet'), 'Microsoft.Network/publicIPAddresses', variables('publicIPAddressName')  )]"
               },
               "subnet": {
                 "id": "[variables('subnetRef')]"
