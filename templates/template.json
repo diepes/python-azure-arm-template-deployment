@@ -53,9 +53,9 @@
       }
     },
     {
-      "apiVersion": "[variables('apiVersion')]",
       "type": "Microsoft.Network/networkSecurityGroups",
       "name": "[variables('networkSecurityGroupName')]",
+      "apiVersion": "[variables('apiVersion')]",
       "location": "[variables('location')]",
       "properties": {
         "securityRules": [
@@ -77,9 +77,9 @@
       }
     },
     {
-      "apiVersion": "[variables('apiVersion')]",
       "type": "Microsoft.Network/publicIPAddresses",
       "name": "[variables('publicIPAddressName')]",
+      "apiVersion": "[variables('apiVersion')]",
       "location": "[variables('location')]",
       "properties": {
         "publicIPAllocationMethod": "[variables('publicIPAddressType')]",
@@ -90,9 +90,9 @@
     },
 
     {
-      "apiVersion": "[variables('apiVersion')]",
       "type": "Microsoft.Network/networkInterfaces",
       "name": "[variables('nicName')]",
+      "apiVersion": "[variables('apiVersion')]",
       "location": "[variables('location')]",
       "dependsOn": [
         "[concat('Microsoft.Network/publicIPAddresses/', variables('publicIPAddressName'))]"
@@ -115,7 +115,7 @@
       }
     },
 
-        {
+    {
             "comments": "PES: copy from template: resource: '/subscriptions/7023221c-6084-483c-bb62-f8db6950fc34/resourceGroups/pieter-rg/providers/Microsoft.Compute/availabilitySets/pieter-AvailabilitySetXXX'.",
             "type": "Microsoft.Compute/availabilitySets",
             "sku": {
@@ -132,13 +132,13 @@
                 "virtualMachines": []
             },
             "dependsOn": []
-        },
+    },
 
 
     {
-      "apiVersion": "2017-12-01",
       "type": "Microsoft.Compute/virtualMachines",
       "name": "[parameters('vmName')]",
+      "apiVersion": "2017-12-01",
       "location": "[variables('location')]",
       "dependsOn": [
         "[resourceId('Microsoft.Compute/availabilitySets', parameters('availabilitySet_name'))]",
