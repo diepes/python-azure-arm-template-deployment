@@ -21,13 +21,17 @@
     "subnetName": { "type": "string", "defaultValue": "[concat(parameters('vmEnvironment'), '-SUBNET')]"
                    ,"metadata": { "description": "Name of the subnet" } },
     "virtualNetworkName": { "type": "string","metadata": { "description": "Name of the virtual network, e.g. VNET-NONPRD" } },
-    "availabilitySet_name": { "defaultValue": "[concat(parameters('vmEnvironment'), '-AvailabilitySet')]", "type": "String" }
+    "availabilitySet_name": { "defaultValue": "[concat(parameters('vmEnvironment'), '-AvailabilitySet')]", "type": "string" }
     },
 
   "variables": {
+    "doc-info1": "https://docs.microsoft.com/en-us/azure/azure-resource-manager/resource-group-template-functions-resource#resourcegroup",
+
+    "rgLocation": "[resourceGroup().location]",
+    "rgNameServer": "[resourceGroup().name]",
+    "rgNameVnet": "parameters('rgVNET')",
     "storageAccountName-INFO": "Storage account between 3 and 24 characters in len only numbers and lower-case letters.",
     "storageAccountName": "[concat(parameters('vmEnvironment'),'disk',uniquestring(resourceGroup().id))]",
-    "location": "[resourceGroup().location]",
     "addressPrefix": "10.0.0.0/16",
     "subnetPrefix": "10.0.0.0/24",
     "nicName": "[concat(parameters('vmName'), '-eth0')]",
@@ -38,16 +42,17 @@
     "networkSecurityGroupName": "[concat(parameters('vmName'), '-NSG')]",
     "sshKeyPath": "[concat('/home/',parameters('adminUsername'),'/.ssh/authorized_keys')]",
     "debug01": "/subscriptions/cfdb116f-fc7d-4e75-9630-9d1da11b73dd/resourceGroups/DEV01/providers/Microsoft.Network/virtualNetworks/VNET-NONPRD/subnets/DEV01-SUBNET",
-    "vnetID": "[resourceId(parameters('rgVNET'), 'Microsoft.Network/virtualNetworks', parameters('virtualNetworkName'))]",
-    "subnetRef": "[concat(variables('vnetID'),'/subnets/',parameters('subnetName'))]",
+    "IdVnet": "[ resourceId(   parameters('rgVNET'), 'Microsoft.Network/virtualNetworks', parameters('virtualNetworkName')   ) ]",
+    "subnetRef": "[concat(variables('IdVnet'),'/subnets/',parameters('subnetName'))]",
+    "IdPubIPAddress" : "[concat(variables('IdVnet'),'/subnets/',parameters('subnetName'))]",
     "apiVersion": "2015-06-15"
   },
   "resources": [
     {
       "type": "Microsoft.Storage/storageAccounts",
       "name": "[variables('storageAccountName')]",
-      "apiVersion": "[variables('apiVersion')]",
-      "location": "[variables('location')]",
+      "apiVersion": "2015-06-15",
+      "location": "[variables('rgLocation')]",
       "properties": {
         "accountType": "[variables('storageAccountType')]"
       }
@@ -55,8 +60,8 @@
     {
       "type": "Microsoft.Network/networkSecurityGroups",
       "name": "[variables('networkSecurityGroupName')]",
-      "apiVersion": "[variables('apiVersion')]",
-      "location": "[variables('location')]",
+      "apiVersion": "2017-06-01",
+      "location": "[variables('rgLocation')]",
       "properties": {
         "securityRules": [
           {
@@ -79,8 +84,8 @@
     {
       "type": "Microsoft.Network/publicIPAddresses",
       "name": "[variables('publicIPAddressName')]",
-      "apiVersion": "[variables('apiVersion')]",
-      "location": "[variables('location')]",
+      "apiVersion": "2017-06-01",
+      "location": "[variables('rgLocation')]",
       "properties": {
         "publicIPAllocationMethod": "[variables('publicIPAddressType')]",
         "dnsSettings": {
@@ -92,11 +97,11 @@
     {
       "type": "Microsoft.Network/networkInterfaces",
       "name": "[variables('nicName')]",
-      "apiVersion": "[variables('apiVersion')]",
-      "location": "[variables('location')]",
+      "apiVersion": "2017-06-01",
+      "location": "[variables('rgLocation')]",
       "dependsOn": [
         "[concat('Microsoft.Network/publicIPAddresses/', variables('publicIPAddressName'))]"
-      ],
+        ],
       "properties": {
         "ipConfigurations": [
           {
@@ -104,7 +109,7 @@
             "properties": {
               "privateIPAllocationMethod": "Dynamic",
               "publicIPAddress": {
-                "id": "[resourceId('Microsoft.Network/publicIPAddresses', variables('publicIPAddressName'))]"
+                "id": "[resourceId(  'Microsoft.Network/publicIPAddresses', variables('publicIPAddressName'))]"
               },
               "subnet": {
                 "id": "[variables('subnetRef')]"
@@ -123,7 +128,7 @@
             },
             "name": "[parameters('availabilitySet_name')]",
             "apiVersion": "2017-12-01",
-            "location": "[variables('location')]",
+            "location": "[variables('rgLocation')]",
             "tags": {},
             "scale": null,
             "properties": {
@@ -139,7 +144,7 @@
       "type": "Microsoft.Compute/virtualMachines",
       "name": "[parameters('vmName')]",
       "apiVersion": "2017-12-01",
-      "location": "[variables('location')]",
+      "location": "[variables('rgLocation')]",
       "dependsOn": [
         "[resourceId('Microsoft.Compute/availabilitySets', parameters('availabilitySet_name'))]",
         "[concat('Microsoft.Storage/storageAccounts/', variables('storageAccountName'))]",
@@ -156,7 +161,7 @@
           "computerName": "[parameters('vmName')]",
           "adminUsername": "[parameters('adminUsername')]",
           "linuxConfiguration": {
-            "disablePasswordAuthentication": "true",
+            "disablePasswordAuthentication": true,
             "ssh": {
               "publicKeys": [
                 {
@@ -195,7 +200,7 @@
         },
         "diagnosticsProfile": {
           "bootDiagnostics": {
-            "enabled": "true",
+            "enabled": true,
             "storageUri": "[concat('http://',variables('storageAccountName'),'.blob.core.windows.net')]"
           }
         }
@@ -206,7 +211,7 @@
       "type": "Microsoft.Compute/virtualMachines/extensions",
       "name": "[concat(parameters('vmName'), '/installsaltstack')]",
       "apiVersion": "2015-06-15",
-      "location": "[variables('location')]",
+      "location": "[variables('rgLocation')]",
       "dependsOn": [
         "[concat('Microsoft.Compute/virtualMachines/', parameters('vmName'))]"
       ],
