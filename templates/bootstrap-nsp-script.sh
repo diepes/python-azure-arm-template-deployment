@@ -100,8 +100,11 @@ EOF
 
 #restart to enable new config and swap.
 #add 5 min restart, 20sec not working probably the agent not deployed yet.
-( sleep 300 ; service walinuxagent restart ) &
-
+echo "#!/bin/bash"                      >  /root/restart-walinuxagent.sh
+echo "service walinuxagent restart"     >> /root/restart-walinuxagent.sh
+echo "rm /root/restart-walinuxagent.sh" >> /root/restart-walinuxagent.sh
+chmod +x /root/restart-walinuxagent.sh
+at now +5 min -f /root/restart-walinuxagent.sh
 
 return & exit 0
 
