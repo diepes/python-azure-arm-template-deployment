@@ -92,8 +92,8 @@ class Deployer(object):
             #print(f"minion: \n{ yaml.dump(salt_minion,default_flow_style=False) }\ngrains: \n{yaml.dump(salt_grains, default_flow_style=False)}")
 
         #Azure create RG
-        self.client.resource_groups.create_or_update(
         self.resource_group =  args['resource_group']
+        self.client.resource_groups.create_or_update(
             self.resource_group,
             {
                 'location': self.location
