@@ -90,16 +90,14 @@ class Deployer(object):
                  print(f" did not find {args['vmName']} in the {args['salt_map']} map file.")
                  exit(1)
             #print(f"minion: \n{ yaml.dump(salt_minion,default_flow_style=False) }\ngrains: \n{yaml.dump(salt_grains, default_flow_style=False)}")
-
-        #Azure create RG
-        self.client.resource_groups.create_or_update(
+        #
         self.resource_group =  args['resource_group']
+        self.client.resource_groups.create_or_update(
             self.resource_group,
             {
                 'location': self.location
             }
         )
-
         #Generate a minion pre-seed key for use with salt master.
         subprocess.run(f"sudo salt-key --gen-keys={salt_id} --gen-keys-dir=/tmp", shell=True)
         subprocess.run(f"sudo cp /tmp/{salt_id}.pub /etc/salt/pki/master/minions/{salt_id}", shell=True)
