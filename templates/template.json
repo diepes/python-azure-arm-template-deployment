@@ -29,7 +29,7 @@
 
     "rgLocation": "[resourceGroup().location]",
     "rgNameServer": "[resourceGroup().name]",
-    "rgNameVnet": "parameters('rgVNET')",
+    "rgNameVnet": "[parameters('rgVNET')]",
     "storageAccountName-INFO": "Storage account between 3 and 24 characters in len only numbers and lower-case letters.",
     "storageAccountName": "[concat(parameters('vmEnvironment'),'disk',uniquestring(resourceGroup().id))]",
     "addressPrefix": "10.0.0.0/16",
