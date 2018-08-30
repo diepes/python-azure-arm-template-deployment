@@ -47,7 +47,41 @@
     "IdPubIPAddress" : "[concat(variables('IdVnet'),'/subnets/',parameters('subnetName'))]",
     "apiVersion": "2015-06-15"
   },
+
   "resources": [
+    { 
+      "apiVersion": "2017-05-10",
+      "name": "nestedTemplate",
+      "type": "Microsoft.Resources/deployments",
+      "comment": "switch to rgNameVnet only for creation of static ip",
+      "resourceGroup": "[variable('rgNameVnet')]",
+      "location": "[variables('rgLocation')]",
+      "properties": {
+        "mode": "Incremental",
+        "template": {
+            "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+            "contentVersion": "1.0.0.0",
+            "parameters": {},
+            "variables": {},
+            "resources": [
+                {
+                  "type": "Microsoft.Network/publicIPAddresses",
+                  "name": "[variables('publicIPAddressName')]",
+                  "apiVersion": "2018-02-01",
+                  "location": "[variables('rgLocation')]",
+                  "properties": {
+                    "publicIPAllocationMethod": "[variables('publicIPAddressType')]",
+                    "dnsSettings": {
+                    "domainNameLabel": "[parameters('dnsLabelPrefix')]"
+                    },
+                    "ipTags": [] 
+                  },
+                  "dependsOn": []
+                }
+            ]
+       }
+      }
+    },
     {
       "type": "Microsoft.Storage/storageAccounts",
       "name": "[variables('storageAccountName')]",
@@ -80,21 +114,6 @@
           }
         ]
       }
-    },
-    {
-      "type": "Microsoft.Network/publicIPAddresses",
-      "name": "[variables('publicIPAddressName')]",
-      "apiVersion": "2018-02-01",
-      "location": "[variables('rgLocation')]",
-      "resourceGroup": "[variables('rgNameVnet')]",
-      "properties": {
-        "publicIPAllocationMethod": "[variables('publicIPAddressType')]",
-        "dnsSettings": {
-          "domainNameLabel": "[parameters('dnsLabelPrefix')]"
-        },
-        "ipTags": [] 
-      },
-      "dependsOn": []
     },
 
     {
