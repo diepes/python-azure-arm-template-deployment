@@ -50,36 +50,39 @@
 
   "resources": [
     { 
-      "apiVersion": "2017-05-10",
-      "name": "nestedTemplate",
       "type": "Microsoft.Resources/deployments",
+      "name": "nestedTemplate",
+      "apiVersion": "2017-05-10",
       "comments": "switch to rgNameVnet only for creation of static ip",
-      "resourceGroup": "[variable('rgNameVnet')]",
       "location": "[variables('rgLocation')]",
       "properties": {
         "mode": "Incremental",
         "template": {
-            "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
-            "contentVersion": "1.0.0.0",
-            "resources": [
-                {
-                  "type": "Microsoft.Network/publicIPAddresses",
-                  "name": "[variables('publicIPAddressName')]",
-                  "apiVersion": "2018-02-01",
-                  "location": "[variables('rgLocation')]",
-                  "properties": {
-                    "publicIPAllocationMethod": "[variables('publicIPAddressType')]",
-                    "dnsSettings": {
+          "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+          "contentVersion": "1.0.0.0",
+
+          "resources": [
+              {
+                "type": "Microsoft.Network/publicIPAddresses",
+                "name": "[variables('publicIPAddressName')]",
+                "resourceGroup": "[variables('rgNameVnet')]",
+                "apiVersion": "2018-02-01",
+                "location": "[variables('rgLocation')]",
+                "properties": {
+                  "publicIPAllocationMethod": "[variables('publicIPAddressType')]",
+                  "dnsSettings": {
                     "domainNameLabel": "[parameters('dnsLabelPrefix')]"
-                    },
-                    "ipTags": [] 
                   },
-                  "dependsOn": []
-                }
-            ]
-       }
+                  "ipTags": [] 
+                },
+                "dependsOn": []
+              }
+          ]
+        }
       }
     },
+  
+
     {
       "type": "Microsoft.Storage/storageAccounts",
       "name": "[variables('storageAccountName')]",
