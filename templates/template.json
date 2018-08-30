@@ -53,8 +53,8 @@
       "type": "Microsoft.Resources/deployments",
       "name": "nestedTemplate",
       "apiVersion": "2017-05-10",
+      "resourceGroup": "[variables('rgNameVnet')]",
       "comments": "switch to rgNameVnet only for creation of static ip",
-      "location": "[variables('rgLocation')]",
       "properties": {
         "mode": "Incremental",
         "template": {
@@ -66,7 +66,6 @@
                 "type": "Microsoft.Network/publicIPAddresses",
                 "name": "[variables('publicIPAddressName')]",
                 "comments": "switch to rgNameVnet only for creation of static ip",
-                "resourceGroup": "[variables('rgNameVnet')]",
                 "apiVersion": "2018-02-01",
                 "location": "[variables('rgLocation')]",
                 "properties": {
