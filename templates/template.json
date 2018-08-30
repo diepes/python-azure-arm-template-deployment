@@ -54,7 +54,7 @@
       "name": "nestedTemplate",
       "apiVersion": "2017-05-10",
       "resourceGroup": "[variables('rgNameVnet')]",
-      "comments": "switch to rgNameVnet only for creation of static ip",
+      "comments": "switch to rgNameVnet only for creation of static ip,subscriptionId",
       "properties": {
         "mode": "Incremental",
         "template": {
