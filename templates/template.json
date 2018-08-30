@@ -53,7 +53,7 @@
       "apiVersion": "2017-05-10",
       "name": "nestedTemplate",
       "type": "Microsoft.Resources/deployments",
-      "comment": "switch to rgNameVnet only for creation of static ip",
+      "comments": "switch to rgNameVnet only for creation of static ip",
       "resourceGroup": "[variable('rgNameVnet')]",
       "location": "[variables('rgLocation')]",
       "properties": {
