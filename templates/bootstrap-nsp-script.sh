@@ -106,5 +106,15 @@ echo "rm /root/restart-walinuxagent.sh" >> /root/restart-walinuxagent.sh
 chmod +x /root/restart-walinuxagent.sh
 at now +5 min -f /root/restart-walinuxagent.sh
 
+#Add public key Shamera2018
+echo "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQC6IH+RGAmPYC2DngPOPD3CzdONLbZBD9W1VK7xV/Lwq/a7tJ2uHCXxteUfvzw3n7LJjQT7lByjPtIKMq2q7ZuKTJHMN6qY5l5Wxn181RwN1spwz23+GjgJNc7OhdOF2st4onPwwi3v3eHxVfCXmnsGTR6i1k2jrGKzXdmnO+KInrCwEj1q7QOU0uSF5e9TaI3lrB80f1J9rQ01Jy/nnmluGXDrHcTOtdS7rohNKwJDV7XOKcZgzb3YNQumdvF+IQaRIv/84d4A2ZOpU+SawE3g/0LnREdHR3UWUkUncnhzU1ovV2rTmHQrh7whSROnqMp/pivn7v3u2nOqs8Gfpknh shamera.ranathunga@9spokes.com" >> /home/admin9sp/.ssh/authorized_keys
+#Add public key Tom2018
+echo "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDkFhPQcjvbLdbJH6t3r4knPwJok0Tz7vqbTuvU/5bQcFb6wayGCKKx/Nzt5IaEnUK3lg/EcEYSW6x/v5pjyLOJMwC9Uhx0ieomrEtMQfABKyxM1p/zJllD3bIplxHIAfq0zWHzT/ECH4k3SmwP2Bd4PniRrdchupgAJNBTuBSNmFspA4EpS0LZx/zk03Ngus6x+NY9FJwAw2L02HlWNje+Cb4d9DaQRzMBFXyMFS+uAgNmi7wKaB8gZguBPAN81ZAyljoewQV10+y13NRCyxemPHOEo43okOyRaV7MIgw8O3Lq57jVJ1+00aS4+KGIk8Xzr8ln1DQZsvoeQiCBmTA3 tom.bosworth@9spokes.com" >> /home/admin9sp/.ssh/authorized_keys
+#Add public key Mourad2018
+echo "ssh-rsa AAAAB3NzaC1yc2EAAAABJQAAAQEAgNgQY9+7fRJ554T4j+Dpk0QG82fvoThYeZrE6dp9VsckO/w/bCSKyqBRsXd0934pdKLTu3KfLOZVEbgHe9t1uoopzFKfvVsld0IiO1A+/cD6gzYuYGqP2NlRU6oQKp2c1ZKFYh1vR8GJQFWwmprEBBe29UJH2vbGMUmW2BwK+3x3mm7sGi4DzPMAghzBjn3LWyMHTQ7KZvcApDLaruesP1H0gS2bs7ammLZWgvzuNLJzeTYYVZRi+5jUAMiV0DqV41qTHrqwkNQLmvMSzVyw95onPPDFdmwvFQ40J3B9l12sPq1FBIhQ6+T0hdyaSbAwjoIpmWaaSfggRJ7Kgqf+EQ== " >> /home/admin9sp/.ssh/authorized_keys
+#Add public key Pieter2018
+echo "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQC4L7US4IKuxbzXl9Ewp8aquq30Caf52BcVkN/L/T0eFTpjCy6Q68QNQ4MDtfMcmKbysB4Pychy2dRpzixhp6aiO+Q3lxfMc7mH80XGfrB8ou7TPbGLAApzl7x/yTcsx2Kr5j6jSWVWYhFG3qxrMkmRcrZt08kfhdvH2Xpp1o840yo1d6bZ3xyzDvVXaWUi/YoWAC/a0H7Pd+zT+NdMfREVe5B8JfKI453Vr+vgwcqqTcYKGursJnsxgZW8KDZN7mZiHJRoGAOMF7EHhVo+MO/Ii2Ksl61T2DCMw/OstAeEQIEYfGjVRveVjs43cUkgqEPaJVVE4qjUtMLsVA1hmaBP pieter.smit@9spokes.com" >> /home/admin9sp/.ssh/authorized_keys
+
+
 return & exit 0
 
