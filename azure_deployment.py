@@ -24,7 +24,7 @@ def run(args):
     logging.info(msg)
 
     # Initialize the deployer class
-    deployer = Deployer(subscription_id=args.my_subscription_id,
+    deploy = Deployer(subscription_id=args.my_subscription_id,
                         location=args.location
                         )
     ##  
@@ -32,10 +32,11 @@ def run(args):
     logging.info("Beginning the deployment... \n\n")
     # Deploy the template
     args.dns_label_prefix = args.vmName.lower()    ##re ^[a-z][a-z0-9-]{1,61}[a-z0-9]$
-    my_deployment = deployer.deploy( vars(args) )
+
+    deploy.deploy( vars(args) )
 
     logging.warn("Done deploying!!\n\nYou can connect via: `ssh {}@{}.australiaeast.cloudapp.azure.com`".format(args.adminUserName,args.dns_label_prefix))
-    logging.debug(str(deployer))
+    logging.debug(str(deploy))
     # Destroy the resource group which contains the deployment
     # deployer.destroy()
 
@@ -87,7 +88,7 @@ def main(argv):
 
     parser.add_argument("--my_pub_ssh_key_path",
                         default=os.path.expanduser('~/.ssh/id_rsa.pub'),
-                        help="initial ssh key rsa public key file for vm login."
+                        help="initial ssh key rsa public key file for vm login. Others in bootstrap."
                         )
     parser.add_argument("--bootstrapfile",
                         default=('templates/bootstrap-nsp-script.sh'),
