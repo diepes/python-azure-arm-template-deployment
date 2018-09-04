@@ -53,7 +53,7 @@
   "resources": [
     { 
       "type": "Microsoft.Resources/deployments",
-      "name": "nestedTemplate",
+      "name": "nestedTemplate-publicIP",
       "apiVersion": "2017-05-10",
       "resourceGroup": "[variables('rgNameVnet')]",
       "comments": "switch to rgNameVnet only for creation of static ip,subscriptionId",
@@ -140,7 +140,7 @@
           }
         ]
       },
-      "dependsOn": ["[variables('publicIPAddressName')]"]
+      "dependsOn": ["nestedTemplate-publicIP"]
     },
 
     {
