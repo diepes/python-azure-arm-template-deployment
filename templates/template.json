@@ -14,6 +14,7 @@
     "vmEnvironment": { "type": "string", "defaultValue": "INF02", "metadata": { "description": "Environment e.g. DEV01 " }  },
     "rgVNET" : { "type": "string", "defaultValue": "[concat(parameters('vmEnvironment'), '')]"
                    ,"metadata": { "description": "Resource group containing the VNET, default DEV01" } },
+    "virtualNetworkName": { "type": "string","metadata": { "description": "Name of the virtual network in rgVNET, e.g. VNET-NONPRD" } },
     "publicIpName" : { "type": "string", "defaultValue": "[concat(parameters('vmName'), '-PublicIP')]"
                     ,"metadata": { "description": "Reuse Public ip if exists, default vmName-PublicIP" } },
     "imagePublisher": { "type": "string", "defaultValue": "canonical", "metadata": { "description": "Name of the image publisher" }  },
@@ -22,7 +23,6 @@
     "imageVersion": { "type": "string", "defaultValue": "latest", "metadata": { "description": "Name of the image sku" }  },
     "subnetName": { "type": "string", "defaultValue": "[concat(parameters('vmEnvironment'), '-SUBNET')]"
                    ,"metadata": { "description": "Name of the subnet" } },
-    "virtualNetworkName": { "type": "string","metadata": { "description": "Name of the virtual network, e.g. VNET-NONPRD" } },
     "availabilitySet_name": { "defaultValue": "[concat(parameters('vmEnvironment'), '-AvailabilitySet')]", "type": "string" }
     },
 
