@@ -14,6 +14,8 @@
     "vmEnvironment": { "type": "string", "defaultValue": "INF02", "metadata": { "description": "Environment e.g. DEV01 " }  },
     "rgVNET" : { "type": "string", "defaultValue": "[concat(parameters('vmEnvironment'), '')]"
                    ,"metadata": { "description": "Resource group containing the VNET, default DEV01" } },
+    "publicIpName" : { "type": "string", "defaultValue": "[concat(parameters('vmName'), '-PublicIP')]"
+                    ,"metadata": { "description": "Reuse Public ip if exists, default vmName-PublicIP" } },
     "imagePublisher": { "type": "string", "defaultValue": "canonical", "metadata": { "description": "Name of the image publisher" }  },
     "imageOffer": { "type": "string", "defaultValue": "ubuntuserver", "metadata": { "description": "Name of the image offer" }  },
     "imageSku": { "type": "string", "defaultValue": "16.04-LTS", "metadata": { "description": "Name of the image sku" } },
@@ -36,7 +38,7 @@
     "subnetPrefix": "10.0.0.0/24",
     "nicName": "[concat(parameters('vmName'), '-eth0')]",
     "osDiskName": "[concat(parameters('vmName'), '-osdisk')]",
-    "publicIPAddressName": "[concat(parameters('vmName'), '-PublicIP')]",
+    "publicIPAddressName": "[parameters('publicIpName')]",
     "publicIPAddressType": "Dynamic",
     "storageAccountType": "Standard_LRS",
     "networkSecurityGroupName": "[concat(parameters('vmName'), '-NSG')]",
