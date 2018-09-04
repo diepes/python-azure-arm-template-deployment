@@ -168,6 +168,11 @@
       "name": "[parameters('vmName')]",
       "apiVersion": "2017-12-01",
       "location": "[variables('rgLocation')]",
+      "plan": {
+        "name": "[parameters('imageSku')]",
+        "product": "[parameters('imageOffer')]",
+        "publisher": "[parameters('imagePublisher')]"
+      },      
       "dependsOn": [
         "[resourceId('Microsoft.Compute/availabilitySets', parameters('availabilitySet_name'))]",
         "[concat('Microsoft.Storage/storageAccounts/', variables('storageAccountName'))]",
