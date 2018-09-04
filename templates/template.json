@@ -100,13 +100,13 @@
       "properties": {
         "securityRules": [
           {
-            "name": "ssh_rule",
+            "name": "ssh_rule_example",
             "properties": {
               "description": "Locks inbound down to ssh default port 22.",
               "protocol": "Tcp",
               "sourcePortRange": "*",
               "destinationPortRange": "22",
-              "sourceAddressPrefix": "*",
+              "sourceAddressPrefix": "10.10.1.4/32",
               "destinationAddressPrefix": "*",
               "access": "Allow",
               "priority": 123,
