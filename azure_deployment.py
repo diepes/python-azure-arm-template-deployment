@@ -86,7 +86,8 @@ def main(argv):
                         )
 
     parser.add_argument("--my_pub_ssh_key_path",
-                        default=os.path.expanduser('~/.ssh/id_rsa.pub'),
+                        #default=os.path.expanduser('~/.ssh/id_rsa.pub'),
+                        default=os.path.expanduser('~/.ssh/authorized_keys'),
                         help="initial ssh key rsa public key file for vm login. Others in bootstrap."
                         )
     parser.add_argument("--bootstrapfile",
