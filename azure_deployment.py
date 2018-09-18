@@ -95,11 +95,10 @@ def main(argv):
                         help="bootstrap salt install."
                         )
     parser.add_argument("--salt_map",nargs='?',
-                        default=('/etc/salt/cloud.maps.d/AEA01/azure_DEV01_06_AEA01.conf'),
-                        help="salt vm config."
+                        help=' salt template look in /etc/salt/cloud.maps.d/*/*.conf'),
                         )
     parser.add_argument("--imageSku" , nargs='?',
-                        default=('14.04.5-LTS'),
+                        default=('16.04-LTS'),
                         help="Linux image to load e.g. '14.04.5-LTS'  ,  '16.04-LTS'  "
                         )
     args = parser.parse_args()
