@@ -56,7 +56,7 @@ class Deployer(object):
                 with open(pub_ssh_key_path, 'r') as pub_ssh_file_fd:
                     pub_ssh_key = pub_ssh_key +  pub_ssh_file_fd.read()
             else:
-                logging.warn(f"ssh keys:  {pub_ssh_key}  not readable/available.")
+                logging.warn(f"ssh keys:  {pub_ssh_key_path}  not readable/available.")
                 pub_ssh_key = ""
         pub_ssh_key = pub_ssh_key.strip()
         logging.debug(f"ssh keys:  {pub_ssh_key}")
@@ -131,11 +131,14 @@ class Deployer(object):
         logging.debug(f"template['parameters'].keys(): {template['parameters'].keys()}")
         logging.debug(f"args.keys(): {args.keys()}")
         parameters = {
-            'sshKeyData': pub_ssh_key,
             'dnsLabelPrefix':  args['dns_label_prefix'],
             'bootstrapScriptBase64' : bootstrapScriptBase64,
             'vmEnvironment': self.resource_group,
         }
+
+        if pub_ssh_key: parameters['sshKeyData'] = pub_ssh_key
+
+
         #Add all matching args values to parameters.
         for k,v in args.items():
             if k in template['parameters']:

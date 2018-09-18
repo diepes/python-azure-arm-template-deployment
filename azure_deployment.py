@@ -41,7 +41,6 @@ def run(args):
     # deployer.destroy()
 
 def main(argv):
-    json_template = ''
     example_text = '''example:
 
  # time ./azure_deployment.py --resource_group DEV01 --vmName ALL01DEV01AEA01 --rgVNET VNET-NONPRD --virtualNetworkName VNET-NONPRD 
