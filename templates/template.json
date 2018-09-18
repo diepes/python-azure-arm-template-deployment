@@ -23,7 +23,9 @@
     "imageVersion": { "type": "string", "defaultValue": "latest", "metadata": { "description": "Name of the image sku" }  },
     "subnetName": { "type": "string", "defaultValue": "[concat(parameters('vmEnvironment'), '-SUBNET')]"
                    ,"metadata": { "description": "Name of the subnet" } },
-    "availabilitySet_name": { "defaultValue": "[concat(parameters('vmEnvironment'), '-AvailabilitySet')]", "type": "string" }
+    "availabilitySet_name": { "defaultValue": "[concat(parameters('vmEnvironment'), '-AvailabilitySet')]", "type": "string" },
+    "nsgHttpsSrc": { "defaultValue": "0.0.0.0/0", "type": "string" },
+    "nsgHttpSrc": { "defaultValue": "0.0.0.0/0", "type": "string" }
     },
 
   "variables": {
@@ -43,11 +45,12 @@
     "storageAccountType": "Standard_LRS",
     "networkSecurityGroupName": "[concat(parameters('vmName'), '-NSG')]",
     "sshKeyPath": "[concat('/home/',parameters('adminUsername'),'/.ssh/authorized_keys')]",
-    "debug01": "/subscriptions/cfdb116f-fc7d-4e75-9630-9d1da11b73dd/resourceGroups/DEV01/providers/Microsoft.Network/virtualNetworks/VNET-NONPRD/subnets/DEV01-SUBNET",
     "IdVnet": "[ resourceId(   parameters('rgVNET'), 'Microsoft.Network/virtualNetworks', parameters('virtualNetworkName')   ) ]",
     "subnetRef": "[concat(variables('IdVnet'),'/subnets/',parameters('subnetName'))]",
     "IdPubIPAddress" : "[concat(variables('IdVnet'),'/subnets/',parameters('subnetName'))]",
-    "apiVersion": "2015-06-15"
+    "apiVersion": "2015-06-15",
+    "NSG-HTTPS-SRC": "[parameters('nsgHttpsSrc')]",
+    "NSG-HTTP-SRC": "[parameters('nsgHttpSrc')]"
   },
 
   "resources": [
@@ -102,19 +105,33 @@
       "properties": {
         "securityRules": [
           {
-            "name": "ssh_rule_example",
+            "name": "https_port_443",
             "properties": {
-              "description": "Locks inbound down to ssh default port 22.",
+              "description": "Locks inbound down.",
               "protocol": "Tcp",
               "sourcePortRange": "*",
-              "destinationPortRange": "22",
-              "sourceAddressPrefix": "10.10.1.4/32",
+              "destinationPortRange": "443",
+              "sourceAddressPrefix": "[variables('NSG-HTTPS-SRC')]",
               "destinationAddressPrefix": "*",
               "access": "Allow",
-              "priority": 123,
+              "priority": 443,
               "direction": "Inbound"
             }
-          }
+          },
+          {
+            "name": "http_port_80",
+            "properties": {
+              "description": "Locks inbound down.",
+              "protocol": "Tcp",
+              "sourcePortRange": "*",
+              "destinationPortRange": "80",
+              "sourceAddressPrefix": "[variables('NSG-HTTP-SRC')]",
+              "destinationAddressPrefix": "*",
+              "access": "Allow",
+              "priority": 440,
+              "direction": "Inbound"
+            }
+          }          
         ]
       }
     },

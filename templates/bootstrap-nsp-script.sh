@@ -26,7 +26,7 @@ cat > /etc/salt/grains <<EOF
 EOF
 
 python -c 'import urllib; print urllib.urlopen("https://bootstrap.saltstack.com").read()' > /root/bootstrap-salt.sh
-sudo sh /root/bootstrap-salt.sh stable 2018.3
+sudo sh /root/bootstrap-salt.sh stable 2018.3 2>&1 >> /root/bootstrap-salt-$(date -I).log
 #git v2018.3.2
 
 #sh bootstrap-salt.sh -x python3
