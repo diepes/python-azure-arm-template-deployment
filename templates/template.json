@@ -100,7 +100,7 @@
     {
       "type": "Microsoft.Network/networkSecurityGroups",
       "name": "[variables('networkSecurityGroupName')]",
-      "apiVersion": "2017-06-01",
+      "apiVersion": "2017-10-01",
       "location": "[variables('rgLocation')]",
       "properties": {
         "securityRules": [
@@ -111,7 +111,7 @@
               "protocol": "Tcp",
               "sourcePortRange": "*",
               "destinationPortRange": "443",
-              "sourceAddressPrefix": "[variables('NSG-HTTPS-SRC')]",
+              "sourceAddressPrefixs": [ "[variables('NSG-HTTPS-SRC')]" ],
               "destinationAddressPrefix": "*",
               "access": "Allow",
               "priority": 443,
@@ -125,7 +125,7 @@
               "protocol": "Tcp",
               "sourcePortRange": "*",
               "destinationPortRange": "80",
-              "sourceAddressPrefix": "[variables('NSG-HTTP-SRC')]",
+              "sourceAddressPrefixs": [ "[variables('NSG-HTTP-SRC')]" ],
               "destinationAddressPrefix": "*",
               "access": "Allow",
               "priority": 440,
