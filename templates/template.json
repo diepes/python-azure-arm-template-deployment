@@ -49,8 +49,8 @@
     "subnetRef": "[concat(variables('IdVnet'),'/subnets/',parameters('subnetName'))]",
     "IdPubIPAddress" : "[concat(variables('IdVnet'),'/subnets/',parameters('subnetName'))]",
     "apiVersion": "2015-06-15",
-    "NSG-HTTPS-SRC": "split([parameters('nsgHttpsSrc'), ',')]",
-    "NSG-HTTP-SRC": "split([parameters('nsgHttpSrc'), ',')]"
+    "NSG-HTTPS-SRC": "[split(parameters('nsgHttpsSrc'), ',')]",
+    "NSG-HTTP-SRC": "[split(parameters('nsgHttpSrc'), ',')]"
   },
   "resources": [
     { 
