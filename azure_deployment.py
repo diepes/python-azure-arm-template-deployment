@@ -95,7 +95,7 @@ def main(argv):
                         help="bootstrap salt install."
                         )
     parser.add_argument("--salt_map",nargs='?',
-                        help=' salt template look in /etc/salt/cloud.maps.d/*/*.conf'),
+                        help=' salt template look in /etc/salt/cloud.maps.d/*/*.conf',
                         )
     parser.add_argument("--imageSku" , nargs='?',
                         default=('16.04-LTS'),
