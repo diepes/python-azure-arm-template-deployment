@@ -1,7 +1,7 @@
 __pycache__
 *.swp
 go*
-
+settings.json
 #Python3 virtual env, activate with source venv/bin/activate
 #then  pip install azure.cli
 #then  venv/bin/python -m azure.cli login
