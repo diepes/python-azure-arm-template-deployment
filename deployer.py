@@ -52,8 +52,12 @@ class Deployer(object):
         pub_ssh_key = ""
         for pub_ssh_key_path in [ args['my_pub_ssh_key_path'] ]:
             pub_ssh_key_path = os.path.expanduser(pub_ssh_key_path)
-            with open(pub_ssh_key_path, 'r') as pub_ssh_file_fd:
-                pub_ssh_key = pub_ssh_key +  pub_ssh_file_fd.read()
+            if os.access(pub_ssh_key_path, os.R_OK):
+                with open(pub_ssh_key_path, 'r') as pub_ssh_file_fd:
+                    pub_ssh_key = pub_ssh_key +  pub_ssh_file_fd.read()
+            else:
+                logging.warn(f"ssh keys:  {pub_ssh_key}  not readable/available.")
+                pub_ssh_key = ""
         pub_ssh_key = pub_ssh_key.strip()
         logging.debug(f"ssh keys:  {pub_ssh_key}")
 
