@@ -25,14 +25,7 @@ cat > /etc/salt/grains <<EOF
 {salt_grains}
 EOF
 
-python -c 'import urllib; print urllib.urlopen("https://bootstrap.saltstack.com").read()' > /root/bootstrap-salt.sh
-sudo sh /root/bootstrap-salt.sh stable 2018.3 2>&1 >> /root/bootstrap-salt-$(date -I).log
-#git v2018.3.2
 
-#sh bootstrap-salt.sh -x python3
-
-#apt-get update
-#apt-get install -y -o DPkg::Options::=--force-confold salt-minion
 
 
 #Setup swap file through azure agent.
@@ -114,6 +107,21 @@ echo "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDkFhPQcjvbLdbJH6t3r4knPwJok0Tz7vqbTu
 echo "ssh-rsa AAAAB3NzaC1yc2EAAAABJQAAAQEAgNgQY9+7fRJ554T4j+Dpk0QG82fvoThYeZrE6dp9VsckO/w/bCSKyqBRsXd0934pdKLTu3KfLOZVEbgHe9t1uoopzFKfvVsld0IiO1A+/cD6gzYuYGqP2NlRU6oQKp2c1ZKFYh1vR8GJQFWwmprEBBe29UJH2vbGMUmW2BwK+3x3mm7sGi4DzPMAghzBjn3LWyMHTQ7KZvcApDLaruesP1H0gS2bs7ammLZWgvzuNLJzeTYYVZRi+5jUAMiV0DqV41qTHrqwkNQLmvMSzVyw95onPPDFdmwvFQ40J3B9l12sPq1FBIhQ6+T0hdyaSbAwjoIpmWaaSfggRJ7Kgqf+EQ== " >> /home/admin9sp/.ssh/authorized_keys
 #Add public key Pieter2018
 echo "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQC4L7US4IKuxbzXl9Ewp8aquq30Caf52BcVkN/L/T0eFTpjCy6Q68QNQ4MDtfMcmKbysB4Pychy2dRpzixhp6aiO+Q3lxfMc7mH80XGfrB8ou7TPbGLAApzl7x/yTcsx2Kr5j6jSWVWYhFG3qxrMkmRcrZt08kfhdvH2Xpp1o840yo1d6bZ3xyzDvVXaWUi/YoWAC/a0H7Pd+zT+NdMfREVe5B8JfKI453Vr+vgwcqqTcYKGursJnsxgZW8KDZN7mZiHJRoGAOMF7EHhVo+MO/Ii2Ksl61T2DCMw/OstAeEQIEYfGjVRveVjs43cUkgqEPaJVVE4qjUtMLsVA1hmaBP pieter.smit@9spokes.com" >> /home/admin9sp/.ssh/authorized_keys
+
+
+python -c 'import urllib; print urllib.urlopen("https://bootstrap.saltstack.com").read()' > /root/bootstrap-salt.sh
+#Loop until not lock on dpkg or 18x10sec= 2min
+NEXT_WAIT_TIME=0
+until fuser /var/lib/dpkg/lock >/dev/null 2>&1 || [ $NEXT_WAIT_TIME -eq 18 ]; do
+    echo "# Wait for /var/lib/dpkg/lock to not be owned. sleep 10, #$NEXT_WAIT_TIME"
+    sleep 10
+    let NEXT_WAIT_TIME=NEXT_WAIT_TIME+1
+done
+sudo sh /root/bootstrap-salt.sh stable 2018.3 2>&1 >> /root/bootstrap-salt-$(date -I).log
+#git v2018.3.2
+#sh bootstrap-salt.sh -x python3
+#apt-get update
+#apt-get install -y -o DPkg::Options::=--force-confold salt-minion
 
 
 return & exit 0
