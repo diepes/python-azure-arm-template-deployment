@@ -24,8 +24,8 @@
     "subnetName": { "type": "string", "defaultValue": "[concat(parameters('vmEnvironment'), '-SUBNET')]"
                    ,"metadata": { "description": "Name of the subnet" } },
     "availabilitySet_name": { "defaultValue": "[concat(parameters('vmEnvironment'), '-AvailabilitySet')]", "type": "string" },
-    "nsgHttpsSrc": { "defaultValue": "0.0.0.0/0", "type": "string" },
-    "nsgHttpSrc": { "defaultValue": "0.0.0.0/0", "type": "string" }
+    "nsgHttpsSrc": { "defaultValue": "0.0.0.0/32", "type": "string" },
+    "nsgHttpSrc": { "defaultValue": "0.0.0.0/32", "type": "string" }
     },
 
   "variables": {
