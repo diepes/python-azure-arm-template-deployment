@@ -111,18 +111,18 @@ echo "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQC4L7US4IKuxbzXl9Ewp8aquq30Caf52BcVkN
 
 python -c 'import urllib; print urllib.urlopen("https://bootstrap.saltstack.com").read()' > /root/bootstrap-salt.sh
 #Loop until not lock on dpkg or 18x10sec= 2min
-NEXT_WAIT_TIME=0
-until fuser /var/lib/dpkg/lock >/dev/null 2>&1 || [ $NEXT_WAIT_TIME -eq 18 ]; do
-    echo "# Wait for /var/lib/dpkg/lock to not be owned. sleep 10, #$NEXT_WAIT_TIME"
-    sleep 10
-    let NEXT_WAIT_TIME=NEXT_WAIT_TIME+1
+echo "check if apt available before running salt bootstrap ...."
+while fuser /var/lib/dpkg/lock /var/lib/apt/lists/lock /var/cache/apt/archives/lock >/dev/null 2>&1; do 
+echo 'Waiting for release of dpkg/apt locks $(date -Is)'
+sleep 10
 done
+echo "run salt bootstrap ...."
 sudo sh /root/bootstrap-salt.sh stable 2018.3 2>&1 >> /root/bootstrap-salt-$(date -I).log
 #git v2018.3.2
 #sh bootstrap-salt.sh -x python3
 #apt-get update
 #apt-get install -y -o DPkg::Options::=--force-confold salt-minion
 
-
+echo "python bootstrap - THE END."
 return & exit 0
 
