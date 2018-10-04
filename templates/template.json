@@ -41,7 +41,7 @@
     "nicName": "[concat(parameters('vmName'), '-eth0')]",
     "osDiskName": "[concat(parameters('vmName'), '-osdisk')]",
     "publicIPAddressName": "[parameters('publicIpName')]",
-    "publicIPAddressType": "Dynamic",
+    "publicIPAddressType": "Static",
     "storageAccountType": "Standard_LRS",
     "networkSecurityGroupName": "[concat(parameters('vmName'), '-NSG')]",
     "sshKeyPath": "[concat('/home/',parameters('adminUsername'),'/.ssh/authorized_keys')]",
