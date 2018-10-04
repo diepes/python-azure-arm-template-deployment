@@ -96,6 +96,10 @@ class Deployer(object):
                  exit(1)
             #print(f"minion: \n{ yaml.dump(salt_minion,default_flow_style=False) }\ngrains: \n{yaml.dump(salt_grains, default_flow_style=False)}")
 
+        if 'location' in args:
+            self.location = args['location']
+            logging.warn(f"Warning vmName:{args['vmName']} set location to:{self.location}")
+
         #Azure create RG
         self.resource_group =  args['resource_group']
         self.client.resource_groups.create_or_update(
