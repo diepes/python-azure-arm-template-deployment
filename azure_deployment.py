@@ -2,6 +2,8 @@
 
 import sys, argparse, logging
 import os.path
+print("Not used anymore - integrated into deployment 2018-11-05")
+os.exit(1)
 # logging level set with -v flag
 logging.basicConfig(level=logging.WARNING,format='[%(levelname)-5s] %(message)s')
 logging.warning("Start!")
