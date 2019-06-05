@@ -3,7 +3,7 @@
 import sys, argparse, logging
 import os.path
 print("Not used anymore - integrated into deployment 2018-11-05")
-os.exit(1)
+sys.exit(1)
 # logging level set with -v flag
 logging.basicConfig(level=logging.WARNING,format='[%(levelname)-5s] %(message)s')
 logging.warning("Start!")
@@ -29,7 +29,7 @@ def run(args):
     deploy = Deployer(subscription_id=args.my_subscription_id,
                         location=args.location
                         )
-    ##  
+    ##
 
     logging.info("Beginning the deployment... \n\n")
     # Deploy the template
@@ -45,7 +45,7 @@ def run(args):
 def main(argv):
     example_text = '''example:
 
- # time ./azure_deployment.py --resource_group DEV01 --vmName ALL01DEV01AEA01 --rgVNET VNET-NONPRD --virtualNetworkName VNET-NONPRD 
+ # time ./azure_deployment.py --resource_group DEV01 --vmName ALL01DEV01AEA01 --rgVNET VNET-NONPRD --virtualNetworkName VNET-NONPRD
                    '''
 
     parser = argparse.ArgumentParser(epilog=example_text,formatter_class=argparse.ArgumentDefaultsHelpFormatter)
