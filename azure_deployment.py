@@ -3,6 +3,7 @@
 import sys, argparse, logging
 import os.path
 print("Not used anymore - integrated into deployment 2018-11-05")
+print("  9s-saltstack-config/azure-9s-arm-deploy")
 sys.exit(1)
 # logging level set with -v flag
 logging.basicConfig(level=logging.WARNING,format='[%(levelname)-5s] %(message)s')
